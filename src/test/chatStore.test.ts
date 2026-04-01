@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { useChatStore } from "../../features/chat/store";
+import { useChatStore } from "../features/chat/store";
 import type { Message, Conversation } from "../../types";
 
 const MOCK_CONVERSATION: Conversation = {
@@ -206,12 +206,12 @@ describe("chatStore", () => {
       useChatStore.setState({
         messagesByConversationId: { conv_orphan: [msg] },
       });
-      // Should not throw
+      // Should not throw and should not modify the message
       useChatStore.getState().finaliseStream();
       expect(
         useChatStore.getState().messagesByConversationId["conv_orphan"]![0]
           .content,
-      ).toBe("");
+      ).toBe("Hello world"); // content unchanged — no-op when streamState is null
     });
 
     it("failStream marks the message as error and keeps streamState with error status", () => {
