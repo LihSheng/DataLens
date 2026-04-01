@@ -33,6 +33,7 @@ describe("authStore", () => {
         id: "usr_1",
         email: "alice@example.com",
         name: "Alice Chen",
+        role: "admin",
       });
       expect(useAuthStore.getState().accessToken).toMatch(/^eyJhbGci/);
       expect(useAuthStore.getState().isLoading).toBe(false);

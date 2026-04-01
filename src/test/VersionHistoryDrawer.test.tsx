@@ -1,5 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, afterEach } from "vitest";
+import {
+  render,
+  screen,
+  waitFor,
+  cleanup,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -19,6 +25,7 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe("VersionHistoryDrawer", () => {
+  afterEach(() => cleanup());
   it("renders nothing when isOpen is false", () => {
     const { container } = renderWithProviders(
       <VersionHistoryDrawer
@@ -120,7 +127,7 @@ describe("VersionHistoryDrawer", () => {
   });
 
   it("shows empty state when document has no versions", async () => {
-    renderWithProviders(
+    const { container } = renderWithProviders(
       <VersionHistoryDrawer
         documentId="doc_unknown"
         isOpen={true}
@@ -128,10 +135,14 @@ describe("VersionHistoryDrawer", () => {
       />,
     );
 
+    const drawer = within(container);
+
+    // Wait for loading to finish and empty state to appear
     await waitFor(() => {
-      expect(screen.queryByText(/version/i)).not.toBeInTheDocument();
+      expect(drawer.queryByText(/no versions found/i)).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/no versions found/i)).toBeInTheDocument();
+    // No version rows should appear (scoped to this drawer only)
+    expect(drawer.queryByText(/version \d/i)).not.toBeInTheDocument();
   });
 });
