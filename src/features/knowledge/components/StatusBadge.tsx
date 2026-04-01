@@ -25,7 +25,7 @@ export function StatusBadge({
 }: StatusBadgeProps) {
   const { variant, label } = statusConfig[status];
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex flex-col gap-0.5 items-start">
       <Badge
         variant={variant}
         className="gap-1"
@@ -36,7 +36,9 @@ export function StatusBadge({
         )}
         {label}
       </Badge>
-      {status === "processing" && <QueueHint queuePosition={queuePosition} />}
+      {status === "processing" && queuePosition && (
+        <QueueHint queuePosition={queuePosition} />
+      )}
     </div>
   );
 }

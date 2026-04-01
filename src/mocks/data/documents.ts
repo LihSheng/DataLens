@@ -106,8 +106,8 @@ export const MOCK_DOCUMENT_RECORDS: DocumentRecord[] = [
   },
 ];
 
-// In-memory store for mutations in tests
-let documents = [...MOCK_DOCUMENTS];
+// In-memory store for mutations in tests — seed with full DocumentRecord fields
+let documents: DocumentRecord[] = [...MOCK_DOCUMENT_RECORDS];
 
 export const getDocuments = () => [...documents];
 

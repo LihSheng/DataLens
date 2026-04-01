@@ -29,7 +29,7 @@ const iconMap: Record<string, typeof FileText> = {
 };
 
 interface DocumentTypeIconProps {
-  extension: string;
+  extension?: string;
   className?: string;
 }
 
@@ -37,7 +37,7 @@ export function DocumentTypeIcon({
   extension,
   className,
 }: DocumentTypeIconProps) {
-  const Icon = iconMap[extension.toLowerCase()] ?? File;
+  const Icon = extension ? (iconMap[extension.toLowerCase()] ?? File) : File;
   return (
     <Icon className={className ?? "h-4 w-4 shrink-0 text-muted-foreground"} />
   );
