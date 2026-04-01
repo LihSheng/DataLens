@@ -5,6 +5,7 @@ import { GroundingIndicator } from "./GroundingIndicator";
 import { CachePill } from "./CachePill";
 import { ModelBadge } from "./ModelBadge";
 import { NoAnswerState } from "./NoAnswerState";
+import { FeedbackButtons } from "./FeedbackButtons";
 import type { Message, CitationValidity } from "../../../types";
 
 interface ChatMessageProps {
@@ -151,6 +152,13 @@ export function ChatMessage({ message, isStreaming }: ChatMessageProps) {
             <span className="text-xs text-muted-foreground ml-auto">
               {time}
             </span>
+          </div>
+        )}
+
+        {/* Feedback buttons — assistant only, after badges, before timestamp */}
+        {!isUser && !isStreaming && (
+          <div className="px-1">
+            <FeedbackButtons message={message} />
           </div>
         )}
 

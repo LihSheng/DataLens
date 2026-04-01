@@ -9,6 +9,7 @@ interface ChatState {
   activeFilters: ChatFilters;
   draftMessage: string;
   visibleFollowupMessageId: string | null;
+  submittedFeedback: Record<string, "positive" | "negative">;
 
   setConversations: (conversations: Conversation[]) => void;
   addConversation: (conversation: Conversation) => void;
@@ -27,6 +28,10 @@ interface ChatState {
   clearActiveFilters: () => void;
   setDraftMessage: (message: string) => void;
   setVisibleFollowupMessageId: (messageId: string | null) => void;
+  setFeedbackSubmitted: (
+    messageId: string,
+    rating: "positive" | "negative",
+  ) => void;
 }
 
 export const useChatStore = create<ChatState>()((set) => ({
@@ -37,6 +42,7 @@ export const useChatStore = create<ChatState>()((set) => ({
   activeFilters: {},
   draftMessage: "",
   visibleFollowupMessageId: null,
+  submittedFeedback: {},
 
   setConversations: (conversations) => set({ conversations }),
 
@@ -60,7 +66,12 @@ export const useChatStore = create<ChatState>()((set) => ({
       },
     })),
 
-  updateStreamingMessage: (conversationId, messageId, content, suggestedFollowups) =>
+  updateStreamingMessage: (
+    conversationId,
+    messageId,
+    content,
+    suggestedFollowups,
+  ) =>
     set((s) => ({
       messages: {
         ...s.messages,
@@ -95,4 +106,9 @@ export const useChatStore = create<ChatState>()((set) => ({
 
   setVisibleFollowupMessageId: (messageId) =>
     set({ visibleFollowupMessageId: messageId }),
+
+  setFeedbackSubmitted: (messageId, rating) =>
+    set((s) => ({
+      submittedFeedback: { ...s.submittedFeedback, [messageId]: rating },
+    })),
 }));

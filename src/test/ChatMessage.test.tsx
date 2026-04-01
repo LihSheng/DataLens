@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ChatMessage } from "../features/chat/components/ChatMessage";
 import type { Message } from "../types";
+
+const queryClient = new QueryClient();
 
 const userMessage: Message = {
   id: "msg_1",
@@ -47,7 +50,11 @@ const assistantMessageWithSources: Message = {
 
 describe("ChatMessage", () => {
   it("renders user message with correct styling", () => {
-    render(<ChatMessage message={userMessage} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={userMessage} />
+      </QueryClientProvider>,
+    );
 
     // Find the outer flex container (the one with justify-end for user messages)
     // The user message bubble has rounded-br-md class
@@ -59,7 +66,11 @@ describe("ChatMessage", () => {
   });
 
   it("renders assistant message with correct styling", () => {
-    render(<ChatMessage message={assistantMessage} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={assistantMessage} />
+      </QueryClientProvider>,
+    );
 
     // Find the outer flex container for assistant (should have justify-start)
     // Assistant bubble has rounded-bl-md
@@ -70,14 +81,22 @@ describe("ChatMessage", () => {
   });
 
   it("renders timestamp span for user message", () => {
-    render(<ChatMessage message={userMessage} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={userMessage} />
+      </QueryClientProvider>,
+    );
     // The timestamp is rendered as a span with text-muted-foreground class
     const timestamp = document.querySelector(".text-muted-foreground");
     expect(timestamp).toBeInTheDocument();
   });
 
   it("renders timestamp span for assistant message", () => {
-    render(<ChatMessage message={assistantMessage} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={assistantMessage} />
+      </QueryClientProvider>,
+    );
     // The outer container for assistant message has justify-start
     // Find the text-muted-foreground timestamp inside
     const timestamps = document.querySelectorAll(".text-muted-foreground");
@@ -85,20 +104,32 @@ describe("ChatMessage", () => {
   });
 
   it("renders CopyButton for assistant message (not user)", () => {
-    render(<ChatMessage message={assistantMessage} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={assistantMessage} />
+      </QueryClientProvider>,
+    );
     const copyButton = screen.getByRole("button", { name: /copy/i });
     expect(copyButton).toBeInTheDocument();
   });
 
   it("does not render CopyButton for user message", () => {
-    render(<ChatMessage message={userMessage} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={userMessage} />
+      </QueryClientProvider>,
+    );
     expect(
       screen.queryByRole("button", { name: /copy/i }),
     ).not.toBeInTheDocument();
   });
 
   it("renders streaming cursor when isStreaming is true", () => {
-    render(<ChatMessage message={assistantMessage} isStreaming={true} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={assistantMessage} isStreaming={true} />
+      </QueryClientProvider>,
+    );
     // Streaming cursor is a span with bg-primary and animate-pulse
     const streamingCursors = document.querySelectorAll(
       "span.bg-primary.animate-pulse",
@@ -107,7 +138,11 @@ describe("ChatMessage", () => {
   });
 
   it("does not render streaming cursor when isStreaming is false", () => {
-    render(<ChatMessage message={assistantMessage} isStreaming={false} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={assistantMessage} isStreaming={false} />
+      </QueryClientProvider>,
+    );
     // The streaming cursor is the span with bg-primary and animate-pulse
     // When isStreaming=false, no such element should exist
     const streamingCursors = document.querySelectorAll(
@@ -117,7 +152,11 @@ describe("ChatMessage", () => {
   });
 
   it("renders citation chips for messages with sources", () => {
-    render(<ChatMessage message={assistantMessageWithSources} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={assistantMessageWithSources} />
+      </QueryClientProvider>,
+    );
     expect(screen.getByText("[1]")).toBeInTheDocument();
     expect(screen.getByText("[2]")).toBeInTheDocument();
   });
