@@ -1,9 +1,12 @@
 import type { DocumentStatus } from "../../../types";
 import { Badge } from "../../../components/ui/Badge";
 import { Loader2 } from "lucide-react";
+import { QueueHint } from "./QueueHint";
 
 interface StatusBadgeProps {
   status: DocumentStatus;
+  parseError?: string;
+  queuePosition?: number;
 }
 
 const statusConfig: Record<
@@ -15,12 +18,25 @@ const statusConfig: Record<
   failed: { variant: "destructive", label: "Failed" },
 };
 
-export function StatusBadge({ status }: StatusBadgeProps) {
+export function StatusBadge({
+  status,
+  parseError,
+  queuePosition,
+}: StatusBadgeProps) {
   const { variant, label } = statusConfig[status];
   return (
-    <Badge variant={variant} className="gap-1">
-      {status === "processing" && <Loader2 className="h-3 w-3 animate-spin" />}
-      {label}
-    </Badge>
+    <div className="flex flex-col gap-0.5">
+      <Badge
+        variant={variant}
+        className="gap-1"
+        title={status === "failed" && parseError ? parseError : undefined}
+      >
+        {status === "processing" && (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        )}
+        {label}
+      </Badge>
+      {status === "processing" && <QueueHint queuePosition={queuePosition} />}
+    </div>
   );
 }

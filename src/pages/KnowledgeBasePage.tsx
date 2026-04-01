@@ -1,70 +1,14 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Database, FileText, RefreshCw, Search, Trash2 } from "lucide-react";
+import { Database, RefreshCw, Search } from "lucide-react";
 import { EmptyState } from "../components/EmptyState";
 import { FileUploader } from "../features/knowledge/components/FileUploader";
-import { StatusBadge } from "../features/knowledge/components/StatusBadge";
 import { Button } from "../components/ui/Button";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
+import { DocumentTable } from "../features/knowledge/components/DocumentTable";
 import { deleteDocument } from "../services/api/documents";
 import { useUIStore } from "../store/uiStore";
-import type { Document, DocumentStatus } from "../types";
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(iso));
-}
-
-function TableSkeleton() {
-  return (
-    <div className="rounded-lg border bg-card overflow-x-auto">
-      <table className="w-full text-sm min-w-[600px]">
-        <thead>
-          <tr className="border-b bg-muted/50">
-            <th className="px-4 py-3 text-left font-medium">Name</th>
-            <th className="px-4 py-3 text-left font-medium">Size</th>
-            <th className="px-4 py-3 text-left font-medium">Uploaded</th>
-            <th className="px-4 py-3 text-left font-medium">Status</th>
-            <th className="px-4 py-3 text-right font-medium">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y">
-          {[0, 1, 2].map((i) => (
-            <tr key={i}>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 bg-muted rounded animate-pulse" />
-                  <div className="h-4 w-32 bg-muted rounded animate-pulse" />
-                </div>
-              </td>
-              <td className="px-4 py-3">
-                <div className="h-4 w-16 bg-muted rounded animate-pulse" />
-              </td>
-              <td className="px-4 py-3">
-                <div className="h-4 w-24 bg-muted rounded animate-pulse" />
-              </td>
-              <td className="px-4 py-3">
-                <div className="h-5 w-20 bg-muted rounded-full animate-pulse" />
-              </td>
-              <td className="px-4 py-3 text-right">
-                <div className="h-8 w-8 bg-muted rounded animate-pulse ml-auto" />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+import type { Document, DocumentStatus, DocumentRecord } from "../types";
 
 export function KnowledgeBasePage() {
   const queryClient = useQueryClient();
@@ -82,6 +26,7 @@ export function KnowledgeBasePage() {
     doc: null,
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showChunkingWarning, setShowChunkingWarning] = useState(false);
 
   const { data: documents = [], isLoading } = useQuery<Document[]>({
     queryKey: ["documents"],
@@ -134,8 +79,8 @@ export function KnowledgeBasePage() {
     });
   }, [documents, searchQuery, statusFilter]);
 
-  const handleDeleteClick = (doc: Document) => {
-    setConfirmDelete({ isOpen: true, doc });
+  const handleDeleteClick = (doc: DocumentRecord) => {
+    setConfirmDelete({ isOpen: true, doc: doc as unknown as Document });
   };
 
   const handleConfirmDelete = () => {
@@ -200,7 +145,7 @@ export function KnowledgeBasePage() {
 
       {/* Document table */}
       {isLoading ? (
-        <TableSkeleton />
+        <DocumentTable documents={[]} isLoading onDelete={() => {}} />
       ) : documents.length === 0 ? (
         <EmptyState
           icon={Database}
@@ -214,54 +159,14 @@ export function KnowledgeBasePage() {
           description="Try adjusting your search query or status filter."
         />
       ) : (
-        <div className="rounded-lg border bg-card overflow-x-auto">
-          <table className="w-full text-sm min-w-[600px]">
-            <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="px-4 py-3 text-left font-medium">Name</th>
-                <th className="px-4 py-3 text-left font-medium">Size</th>
-                <th className="px-4 py-3 text-left font-medium">Uploaded</th>
-                <th className="px-4 py-3 text-left font-medium">Status</th>
-                <th className="px-4 py-3 text-right font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filteredDocuments.map((doc) => (
-                <tr
-                  key={doc.id}
-                  className="hover:bg-muted/30 transition-colors"
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-                      <span className="truncate font-medium">{doc.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {formatBytes(doc.size)}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {formatDate(doc.uploadedAt)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={doc.status} />
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      aria-label="Delete document"
-                      leftIcon={<Trash2 className="h-4 w-4" />}
-                      onClick={() => handleDeleteClick(doc)}
-                      disabled={deleteMutation.isPending}
-                      className="text-muted-foreground hover:text-destructive"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DocumentTable
+          documents={filteredDocuments as DocumentRecord[]}
+          isLoading={false}
+          showChunkingWarning={showChunkingWarning}
+          onDismissChunkingWarning={() => setShowChunkingWarning(false)}
+          onDelete={handleDeleteClick}
+          deleteMutationIsPending={deleteMutation.isPending}
+        />
       )}
 
       {/* Delete confirmation dialog */}
