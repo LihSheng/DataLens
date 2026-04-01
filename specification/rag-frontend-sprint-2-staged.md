@@ -286,7 +286,7 @@ n  - HyDE
 
 ---
 
-## Stage S2.4 — Answer Trust Signals
+## Stage S2.4 — Answer Trust Signals ✅ DONE
 
 **Goal:** Give users clearer signals about answer quality, support, and fallback states without making the UI noisy.
 
@@ -598,7 +598,7 @@ n  - HyDE
 | S2.1 | P0 | Unlocks retrieval controls and scoped chat UX immediately | ✅ DONE |
 | S2.2 | P0 | Makes ingestion/document management production-ready | ✅ DONE |
 | S2.3 | P1 | Improves conversation continuity and engagement | ✅ DONE |
-| S2.4 | P0 | Adds answer trust and fallback clarity |
+| S2.4 | P0 | Adds answer trust and fallback clarity | ✅ DONE |
 | S2.5 | P1 | Useful power-user visibility with low UI risk |
 | S2.6 | P0 | Required foundation for feedback loop and later evals |
 | S2.7 | P1 | High user value once core trust/feedback features exist |
@@ -614,8 +614,8 @@ n  - HyDE
 |---|---|---|---|
 | S2.1 | Retrieval controls | Settings sliders/toggles + chat scope picker | ✅ DONE |
 | S2.2 | Ingestion UX | OCR/PII/version badges, queue state, re-index, version drawer | ✅ DONE |
-| S2.3 | Conversation continuity | Memory indicator + suggested follow-up pills |
-| S2.4 | Trust signals | Confidence, grounding, citation warnings, no-answer state |
+| S2.3 | Conversation continuity | Memory indicator + suggested follow-up pills | ✅ DONE |
+| S2.4 | Trust signals | Confidence, grounding, citation warnings, no-answer state | ✅ DONE |
 | S2.5 | Context visibility | Token usage footer in source panel |
 | S2.6 | Feedback loop | Thumbs up/down with optional negative comment |
 | S2.7 | Conversation utilities | Search, export, share, read-only shared page |
