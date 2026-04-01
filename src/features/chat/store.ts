@@ -7,6 +7,8 @@ interface ChatState {
   messages: Record<string, Message[]>; // keyed by conversationId
   isStreaming: boolean;
   activeFilters: ChatFilters;
+  draftMessage: string;
+  visibleFollowupMessageId: string | null;
 
   setConversations: (conversations: Conversation[]) => void;
   addConversation: (conversation: Conversation) => void;
@@ -17,11 +19,14 @@ interface ChatState {
     conversationId: string,
     messageId: string,
     content: string,
+    suggestedFollowups?: string[],
   ) => void;
   setIsStreaming: (streaming: boolean) => void;
   clearMessages: (conversationId: string) => void;
   setActiveFilters: (filters: ChatFilters) => void;
   clearActiveFilters: () => void;
+  setDraftMessage: (message: string) => void;
+  setVisibleFollowupMessageId: (messageId: string | null) => void;
 }
 
 export const useChatStore = create<ChatState>()((set) => ({
@@ -30,6 +35,8 @@ export const useChatStore = create<ChatState>()((set) => ({
   messages: {},
   isStreaming: false,
   activeFilters: {},
+  draftMessage: "",
+  visibleFollowupMessageId: null,
 
   setConversations: (conversations) => set({ conversations }),
 
@@ -53,12 +60,20 @@ export const useChatStore = create<ChatState>()((set) => ({
       },
     })),
 
-  updateStreamingMessage: (conversationId, messageId, content) =>
+  updateStreamingMessage: (conversationId, messageId, content, suggestedFollowups) =>
     set((s) => ({
       messages: {
         ...s.messages,
         [conversationId]: (s.messages[conversationId] ?? []).map((m) =>
-          m.id === messageId ? { ...m, content } : m,
+          m.id === messageId
+            ? {
+                ...m,
+                content,
+                ...(suggestedFollowups !== undefined && {
+                  suggestedFollowups,
+                }),
+              }
+            : m,
         ),
       },
     })),
@@ -75,4 +90,9 @@ export const useChatStore = create<ChatState>()((set) => ({
   setActiveFilters: (filters) => set({ activeFilters: filters }),
 
   clearActiveFilters: () => set({ activeFilters: {} }),
+
+  setDraftMessage: (message) => set({ draftMessage: message }),
+
+  setVisibleFollowupMessageId: (messageId) =>
+    set({ visibleFollowupMessageId: messageId }),
 }));

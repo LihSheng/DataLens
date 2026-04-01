@@ -3,27 +3,42 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { SearchScopePicker } from "./SearchScopePicker";
+import { FollowupSuggestionList } from "./FollowupSuggestionList";
 import { EmptyState } from "../../../components/EmptyState";
 import { Loader } from "../../../components/Loader";
 import { MessageSquare } from "lucide-react";
 import { useChatStore } from "../store";
 import { useMessages, useSendMessage } from "../hooks/useChat";
+import { getFollowupsFromMessage } from "../hooks/useFollowupSuggestions";
 import type { Message } from "../../../types";
 
 interface ChatWindowProps {
   conversationId: string | null;
 }
 
+const REVEAL_DELAY_MS = 400;
+
 export function ChatWindow({ conversationId }: ChatWindowProps) {
-  const { messages: storeMessages, isStreaming } = useChatStore();
+  const {
+    messages: storeMessages,
+    isStreaming,
+    draftMessage,
+    visibleFollowupMessageId,
+    setDraftMessage,
+    setVisibleFollowupMessageId,
+  } = useChatStore();
+
   const {
     data: queryMessages,
     isLoading,
     isError,
     refetch,
   } = useMessages(conversationId);
+
   const { send } = useSendMessage();
   const [error, setError] = useState<string | null>(null);
+  const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasStreamingRef = useRef(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -46,6 +61,36 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
         : undefined
       : undefined;
 
+  // Delayed reveal of follow-up suggestions once streaming completes
+  useEffect(() => {
+    const wasStreaming = wasStreamingRef.current;
+    wasStreamingRef.current = isStreaming;
+
+    if (wasStreaming && !isStreaming && messages.length > 0) {
+      // Streaming just finished — find the last assistant message with suggestions
+      const lastAssistant = [...messages]
+        .reverse()
+        .find((m) => m.role === "assistant");
+
+      const suggestions = lastAssistant
+        ? getFollowupsFromMessage(lastAssistant)
+        : [];
+
+      if (lastAssistant && suggestions.length > 0) {
+        revealTimerRef.current = setTimeout(() => {
+          setVisibleFollowupMessageId(lastAssistant.id);
+        }, REVEAL_DELAY_MS);
+      }
+    }
+
+    return () => {
+      if (revealTimerRef.current) {
+        clearTimeout(revealTimerRef.current);
+        revealTimerRef.current = null;
+      }
+    };
+  }, [isStreaming, messages, setVisibleFollowupMessageId]);
+
   // Track if user has scrolled up
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -54,7 +99,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
     isUserScrolledRef.current = distFromBottom > 80;
   };
 
-  // Auto-scroll to bottom when new messages arrive, but only if user hasn't scrolled up
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (!isStreaming && !isUserScrolledRef.current) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -68,15 +113,24 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
     }
   }, [isStreaming]);
 
-  // Reset error when conversation changes
+  // Reset error when conversation changes (existing pattern)
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting local UI state when prop changes
     setError(null);
   }, [conversationId]);
 
+  // Reset follow-up state when conversation changes
+  useEffect(() => {
+    setVisibleFollowupMessageId(null);
+    setDraftMessage("");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting conversation-scoped UI state when active conversation changes
+  }, [conversationId, setVisibleFollowupMessageId, setDraftMessage]);
+
   const handleSend = (messageText: string) => {
     if (!messageText.trim()) return;
     setError(null);
+    setVisibleFollowupMessageId(null);
+    setDraftMessage("");
     try {
       send({
         conversationId: conversationId ?? undefined,
@@ -85,6 +139,17 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
     } catch {
       setError("Failed to send message. Please try again.");
     }
+  };
+
+  const handleDraftChange = (value: string) => {
+    // User is typing a different message — hide any visible follow-ups
+    setVisibleFollowupMessageId(null);
+    setDraftMessage(value);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setDraftMessage(suggestion);
+    // Keep visibleFollowupMessageId so pills stay visible while prefilled
   };
 
   // Empty state: no conversation selected
@@ -167,6 +232,15 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
               message={msg}
               isStreaming={isStreaming && msg.id === streamingMessageId}
             />
+            {/* Follow-up suggestions below the assistant message that just streamed */}
+            {msg.role === "assistant" &&
+              visibleFollowupMessageId === msg.id &&
+              getFollowupsFromMessage(msg).length > 0 && (
+                <FollowupSuggestionList
+                  suggestions={getFollowupsFromMessage(msg)}
+                  onSuggestionClick={handleSuggestionClick}
+                />
+              )}
           </div>
         ))}
 
@@ -178,7 +252,13 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
       <div className="border-t p-4">
         <SearchScopePicker />
         <div className="mt-2">
-          <ChatInput onSend={handleSend} isStreaming={isStreaming} />
+          <ChatInput
+            onSend={handleSend}
+            isStreaming={isStreaming}
+            messageCount={Math.max(0, messages.length - 1)}
+            draft={draftMessage}
+            onDraftChange={handleDraftChange}
+          />
         </div>
       </div>
     </div>

@@ -53,6 +53,7 @@ export function useSendMessage() {
       const assistantMessageId = `stream_${Date.now()}`;
       let assistantContent = "";
       const sources: Message["sources"] = [];
+      let suggestedFollowups: string[] | undefined;
 
       const filters =
         activeFilters.document_ids && activeFilters.document_ids.length > 0
@@ -72,6 +73,7 @@ export function useSendMessage() {
           let data: {
             content?: string;
             sources?: Message["sources"];
+            suggestedFollowups?: string[];
             id?: string;
             role?: string;
             createdAt?: string;
@@ -88,6 +90,7 @@ export function useSendMessage() {
               currentConversationId,
               assistantMessageId,
               assistantContent,
+              data.suggestedFollowups,
             );
           }
           if (data.sources) {
@@ -97,6 +100,9 @@ export function useSendMessage() {
               id: `${s.documentId}_${i}`,
             }));
             sources.push(...indexedSources);
+          }
+          if (data.suggestedFollowups) {
+            suggestedFollowups = data.suggestedFollowups;
           }
         }
       } finally {
@@ -112,6 +118,7 @@ export function useSendMessage() {
         content: assistantContent,
         sources: sources.length > 0 ? sources : undefined,
         createdAt: new Date().toISOString(),
+        suggestedFollowups,
       };
 
       // Invalidate messages so they re-fetch from MSW cache

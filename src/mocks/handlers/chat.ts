@@ -113,6 +113,12 @@ export const chatHandlers = [
     const fullResponse =
       "Based on the retrieved context [1][2], the system processes your query through the RAG pipeline. The document chunks most relevant to your question are retrieved using semantic similarity search, and the LLM generates a response grounded in those chunks.";
 
+    const suggestedFollowups = [
+      "How does semantic similarity search work?",
+      "What chunking strategies are available?",
+      "Can I configure the reranking model?",
+    ];
+
     const stream = new ReadableStream({
       start(controller) {
         const encoder = new TextEncoder();
@@ -120,9 +126,12 @@ export const chatHandlers = [
 
         const push = () => {
           if (index >= fullResponse.length) {
-            // Send sources as final event
-            const sourceEvent = `data: ${JSON.stringify({ sources: MOCK_SOURCES.slice(0, 2) })}\n\n`;
-            controller.enqueue(encoder.encode(sourceEvent));
+            // Send sources + suggested follow-ups as final event
+            const finalEvent = `data: ${JSON.stringify({
+              sources: MOCK_SOURCES.slice(0, 2),
+              suggestedFollowups,
+            })}\n\n`;
+            controller.enqueue(encoder.encode(finalEvent));
             controller.close();
             return;
           }

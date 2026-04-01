@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  /* Staggered reveal animation for follow-up suggestion pills */
+  @keyframes followup-pill-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .animate-followup-pill {
+    animation: followup-pill-in 250ms ease-out both;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

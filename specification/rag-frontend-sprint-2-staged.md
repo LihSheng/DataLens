@@ -134,7 +134,9 @@ export interface ChatResponse {
 
 ---
 
-## Stage S2.1 — Retrieval Controls in Settings + Chat Scope
+## Stage S2.1 — Retrieval Controls in Settings + Chat Scope ✅ DONE
+
+> **Completed:** 2026-04-01
 
 **Goal:** Expose the most important retrieval knobs in the UI and allow the user to narrow search scope directly from chat.
 
@@ -191,7 +193,9 @@ n  - HyDE
 
 ---
 
-## Stage S2.2 — Ingestion UX Enhancements on Knowledge Base
+## Stage S2.2 — Ingestion UX Enhancements on Knowledge Base ✅ DONE
+
+> **Completed:** 2026-04-01
 
 **Goal:** Make document ingestion feel production-ready by exposing richer parsing and processing states.
 
@@ -239,7 +243,7 @@ n  - HyDE
 
 ---
 
-## Stage S2.3 — Multi-Turn Memory + Follow-Up UX
+## Stage S2.3 — Multi-Turn Memory + Follow-Up UX ✅ DONE
 
 **Goal:** Make conversations feel continuous and guide the next user action after each answer.
 
@@ -589,11 +593,11 @@ n  - HyDE
 
 ## Suggested Build Order
 
-| Stage | Priority | Why first |
-|---|---|---|
-| S2.1 | P0 | Unlocks retrieval controls and scoped chat UX immediately |
-| S2.2 | P0 | Makes ingestion/document management production-ready |
-| S2.3 | P1 | Improves conversation continuity and engagement |
+| Stage | Priority | Why first | Status |
+|---|---|---|---|
+| S2.1 | P0 | Unlocks retrieval controls and scoped chat UX immediately | ✅ DONE |
+| S2.2 | P0 | Makes ingestion/document management production-ready | ✅ DONE |
+| S2.3 | P1 | Improves conversation continuity and engagement | ✅ DONE |
 | S2.4 | P0 | Adds answer trust and fallback clarity |
 | S2.5 | P1 | Useful power-user visibility with low UI risk |
 | S2.6 | P0 | Required foundation for feedback loop and later evals |
@@ -606,10 +610,10 @@ n  - HyDE
 
 ## Summary
 
-| Stage | Focus | Key Output |
-|---|---|---|
-| S2.1 | Retrieval controls | Settings sliders/toggles + chat scope picker |
-| S2.2 | Ingestion UX | OCR/PII/version badges, queue state, re-index, version drawer |
+| Stage | Focus | Key Output | Status |
+|---|---|---|---|
+| S2.1 | Retrieval controls | Settings sliders/toggles + chat scope picker | ✅ DONE |
+| S2.2 | Ingestion UX | OCR/PII/version badges, queue state, re-index, version drawer | ✅ DONE |
 | S2.3 | Conversation continuity | Memory indicator + suggested follow-up pills |
 | S2.4 | Trust signals | Confidence, grounding, citation warnings, no-answer state |
 | S2.5 | Context visibility | Token usage footer in source panel |

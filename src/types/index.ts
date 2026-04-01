@@ -32,6 +32,7 @@ export interface Message {
   content: string;
   sources?: Source[];
   createdAt: string;
+  suggestedFollowups?: string[];
 }
 
 export interface Conversation {
@@ -112,7 +113,9 @@ export interface DocumentRecord {
   size: number;
   uploadedAt: string;
   status: "processing" | "ready" | "failed";
-  extension: string;
+  extension?: string;
+  mimeType?: string;
+  chunkCount?: number;
   parseError?: string;
   ocrApplied?: boolean;
   piiEntitiesFound?: string[];
@@ -137,6 +140,23 @@ export interface RAGSettings {
   memoryWindow: number;
   conversationRetentionDays: number;
 }
+
+export const DEFAULT_RAG_SETTINGS: RAGSettings = {
+  modelName: "gpt-4o-mini",
+  topK: 5,
+  temperature: 0.7,
+  maxTokens: 2048,
+  showSourcesPanel: true,
+  enableStreaming: true,
+  hybridWeightDense: 0.5,
+  rerankerEnabled: false,
+  queryExpansionEnabled: false,
+  hydeEnabled: false,
+  chunkingStrategy: "semantic",
+  confidenceThreshold: 0.5,
+  memoryWindow: 5,
+  conversationRetentionDays: 30,
+};
 
 // ─── API Types ──────────────────────────────────────────────────────────────
 
