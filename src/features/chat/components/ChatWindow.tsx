@@ -167,9 +167,9 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col pt-16 lg:pt-0">
       {/* Conversation title header */}
-      <div className="flex items-center gap-2 border-b px-4 py-3 min-h-[52px] pt-10 lg:pt-0">
+      <div className="flex items-center gap-2 border-b px-4 py-3 min-h-[52px]">
         <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
         <h1 className="truncate text-sm font-semibold text-foreground">
           {conversationId
