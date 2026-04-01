@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Bot,
   LogOut,
+  BarChart2,
 } from "lucide-react";
 import { useUIStore } from "../store/uiStore";
 import { useAuthStore } from "../features/auth/store";
@@ -25,6 +26,16 @@ export function Sidebar() {
     toggleSidebar,
     toggleSidebarCollapse,
   } = useUIStore();
+
+  const user = useAuthStore((s) => s.user);
+  const isAdmin = user?.role === "admin";
+
+  const ALL_NAV_ITEMS = [
+    ...NAV_ITEMS,
+    ...(isAdmin
+      ? [{ to: "/observability", icon: BarChart2, label: "Observability" }]
+      : []),
+  ];
 
   return (
     <>
@@ -56,7 +67,7 @@ export function Sidebar() {
             <div className="flex flex-col">
               <span className="font-semibold text-sm">RAG Assistant</span>
               <span className="text-xs text-muted-foreground">
-                Knowledge Q&A
+                Knowledge Q&amp;A
               </span>
             </div>
           )}
@@ -64,7 +75,7 @@ export function Sidebar() {
 
         {/* Nav */}
         <nav className="flex-1 space-y-1 p-2">
-          {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
+          {ALL_NAV_ITEMS.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}

@@ -4,6 +4,7 @@ const MOCK_USER = {
   id: "usr_1",
   email: "alice@example.com",
   name: "Alice Chen",
+  role: "admin" as const,
 };
 
 const VALID_PASSWORD = "password123";

@@ -38,6 +38,11 @@ const SharedConversationPage = lazy(() =>
     default: m.SharedConversationPage,
   })),
 );
+const ObservabilityPage = lazy(() =>
+  import("./pages/ObservabilityPage").then((m) => ({
+    default: m.ObservabilityPage,
+  })),
+);
 
 // ─── Sentry ─────────────────────────────────────────────────────────────────
 
@@ -201,6 +206,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/": "Knowledge Assistant",
   "/knowledge-base": "Knowledge Base",
   "/settings": "Settings",
+  "/observability": "Observability",
 };
 
 function FocusManager() {
@@ -258,6 +264,14 @@ function RoutesComponent() {
             element={
               <RouteErrorBoundary>
                 <SettingsPage />
+              </RouteErrorBoundary>
+            }
+          />
+          <Route
+            path="/observability"
+            element={
+              <RouteErrorBoundary>
+                <ObservabilityPage />
               </RouteErrorBoundary>
             }
           />

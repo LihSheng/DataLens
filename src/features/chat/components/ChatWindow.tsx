@@ -170,8 +170,8 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   return (
     <div className="flex h-full flex-col pt-16 lg:pt-0">
       {/* Conversation title header */}
-      <div className="flex items-center gap-2 border-b px-4 py-3 min-h-[52px]">
-        <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <div className="flex items-center gap-1 border-b px-4 py-3 min-h-[52px]">
+        <MessageSquare className="h-4 w-4 shrink-0 self-center text-muted-foreground" />
         <h1 className="truncate text-sm font-semibold text-foreground flex-1 min-w-0">
           {conversationId
             ? (conversations.find((c) => c.id === conversationId)?.title ??

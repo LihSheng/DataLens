@@ -1,9 +1,12 @@
 // ─── Auth Types ─────────────────────────────────────────────────────────────
 
+export type UserRole = "admin" | "user";
+
 export interface User {
   id: string;
   email: string;
   name: string;
+  role?: UserRole;
 }
 
 export interface AuthState {
@@ -198,3 +201,16 @@ export interface ShareLinkResponse {
   token: string;
   url: string;
 }
+
+// ─── Re-export observability types ──────────────────────────────────────────
+export type {
+  EvaluationRun,
+  EvaluationResult,
+  FeedbackStats,
+  CostSummary,
+  ModelCost,
+  UserCost,
+  AuditEvent,
+  AuditFilters,
+  PaginatedAuditEvents,
+} from "./observability";
