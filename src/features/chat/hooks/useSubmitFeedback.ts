@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useAuthStore } from "../../auth/store";
+import { httpClient } from "../../../services/httpClient";
 import { useUIStore } from "../../../store/uiStore";
 import type { FeedbackRating } from "../../../types";
 
@@ -12,25 +12,12 @@ interface SubmitFeedbackParams {
 }
 
 export function useSubmitFeedback() {
-  const accessToken = useAuthStore((s) => s.accessToken);
   const pushToast = useUIStore((s) => s.pushToast);
 
   return useMutation({
     mutationFn: async (params: SubmitFeedbackParams) => {
-      const response = await fetch("/api/feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-        body: JSON.stringify(params),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to submit feedback: ${response.statusText}`);
-      }
-
-      return response.json();
+      const response = await httpClient.post("/api/feedback", params);
+      return response.data;
     },
     onError: (error: Error) => {
       pushToast({

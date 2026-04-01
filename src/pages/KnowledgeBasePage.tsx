@@ -6,7 +6,7 @@ import { FileUploader } from "../features/knowledge/components/FileUploader";
 import { Button } from "../components/ui/Button";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { DocumentTable } from "../features/knowledge/components/DocumentTable";
-import { deleteDocument } from "../services/api/documents";
+import { deleteDocument, documentsApi } from "../services/api/documents";
 import { useUIStore } from "../store/uiStore";
 import type { Document, DocumentStatus, DocumentRecord } from "../types";
 
@@ -30,11 +30,7 @@ export function KnowledgeBasePage() {
 
   const { data: documents = [], isLoading } = useQuery<DocumentRecord[]>({
     queryKey: ["documents"],
-    queryFn: async () => {
-      const res = await fetch("/api/documents");
-      if (!res.ok) throw new Error("Failed to fetch documents");
-      return res.json();
-    },
+    queryFn: () => documentsApi.getDocuments(),
   });
 
   const deleteMutation = useMutation<

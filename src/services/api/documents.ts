@@ -1,5 +1,12 @@
 import { httpClient } from "../../services/httpClient";
+import { config } from "../../lib/config";
+import { useAuthStore } from "../../features/auth/store";
 import type { Document, DocumentAcl } from "../../types";
+
+function toApiUrl(path: string): string {
+  const base = config.apiBaseUrl?.replace(/\/$/, "");
+  return base ? `${base}${path}` : path;
+}
 
 export const documentsApi = {
   getDocuments: async (): Promise<Document[]> => {
@@ -35,7 +42,11 @@ export function uploadDocument(
     const formData = new FormData();
     formData.append("file", file);
 
-    xhr.open("POST", "/api/documents");
+    xhr.open("POST", toApiUrl("/api/documents"));
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable && onProgress) {
@@ -69,7 +80,11 @@ export function uploadDocument(
 export function deleteDocument(id: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open("DELETE", `/api/documents/${id}`);
+    xhr.open("DELETE", toApiUrl(`/api/documents/${id}`));
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
 
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {

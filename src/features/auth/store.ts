@@ -13,6 +13,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { config } from "../../lib/config";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -53,6 +54,11 @@ interface AuthState {
   clearError: () => void;
 }
 
+function toApiUrl(path: string): string {
+  const base = config.apiBaseUrl?.replace(/\/$/, "");
+  return base ? `${base}${path}` : path;
+}
+
 // ─── Store ──────────────────────────────────────────────────────────────────
 
 export const useAuthStore = create<AuthState>()(
@@ -71,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
           if (credentials.provider === "credentials") {
             // Real implementation would call POST /api/auth/login
             // For now we simulate via MSW (see src/mocks/handlers/auth.ts)
-            const res = await fetch("/api/auth/login", {
+            const res = await fetch(toApiUrl("/api/auth/login"), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -112,7 +118,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         // Fire-and-forget logout call so the server can invalidate the token
-        fetch("/api/auth/logout", {
+        fetch(toApiUrl("/api/auth/logout"), {
           method: "POST",
           headers: {
             Authorization: `Bearer ${useAuthStore.getState().accessToken}`,

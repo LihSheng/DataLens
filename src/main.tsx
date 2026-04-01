@@ -10,7 +10,14 @@ if (localStorage.getItem("theme") === "dark") {
 
 // Start MSW in development mode
 async function prepare() {
-  if (import.meta.env.VITE_APP_ENV !== "production") {
+  const useMsw = (() => {
+    const explicit = import.meta.env.VITE_USE_MSW;
+    if (explicit === "true") return true;
+    if (explicit === "false") return false;
+    return import.meta.env.VITE_APP_ENV !== "production";
+  })();
+
+  if (useMsw) {
     const { worker } = await import("./mocks/browser");
     return worker.start({ onUnhandledRequest: "bypass" });
   }
