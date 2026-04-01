@@ -7,18 +7,11 @@ import {
   useEffect,
 } from "react";
 import { Send } from "lucide-react";
-import { MemoryIndicator } from "./MemoryIndicator";
-
-export interface ChatInputHandle {
-  focus: () => void;
-}
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
   isStreaming?: boolean;
-  /** Total message count in the active conversation (used for memory indicator) */
-  messageCount?: number;
   /**
    * Pre-filled draft value — useful when a follow-up suggestion was clicked
    * but the user has not yet sent it.
@@ -29,17 +22,7 @@ interface ChatInputProps {
 }
 
 export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
-  (
-    {
-      onSend,
-      disabled,
-      isStreaming,
-      messageCount = 0,
-      draft,
-      onDraftChange,
-    },
-    ref,
-  ) => {
+  ({ onSend, disabled, isStreaming, draft, onDraftChange }, ref) => {
     const [internalValue, setInternalValue] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -114,11 +97,6 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
 
     return (
       <div className="relative">
-        {/* Memory active indicator — shown above input when conversation has history */}
-        <div className="mb-2">
-          <MemoryIndicator messageCount={messageCount} />
-        </div>
-
         <div className="flex items-start gap-2 rounded-xl border bg-card p-3 shadow-sm">
           <textarea
             ref={textareaRef}

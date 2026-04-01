@@ -3,6 +3,7 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { SearchScopePicker } from "./SearchScopePicker";
+import { MemoryIndicator } from "./MemoryIndicator";
 import { FollowupSuggestionList } from "./FollowupSuggestionList";
 import { EmptyState } from "../../../components/EmptyState";
 import { Loader } from "../../../components/Loader";
@@ -123,7 +124,6 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   useEffect(() => {
     setVisibleFollowupMessageId(null);
     setDraftMessage("");
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting conversation-scoped UI state when active conversation changes
   }, [conversationId, setVisibleFollowupMessageId, setDraftMessage]);
 
   const handleSend = (messageText: string) => {
@@ -250,16 +250,17 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
 
       {/* Input */}
       <div className="border-t p-4">
-        <SearchScopePicker />
-        <div className="mt-2">
-          <ChatInput
-            onSend={handleSend}
-            isStreaming={isStreaming}
-            messageCount={Math.max(0, messages.length - 1)}
-            draft={draftMessage}
-            onDraftChange={handleDraftChange}
-          />
+        {/* SearchScopePicker + MemoryIndicator on the same row */}
+        <div className="flex items-center gap-3 flex-wrap mb-2">
+          <SearchScopePicker />
+          <MemoryIndicator messageCount={Math.max(0, messages.length - 1)} />
         </div>
+        <ChatInput
+          onSend={handleSend}
+          isStreaming={isStreaming}
+          draft={draftMessage}
+          onDraftChange={handleDraftChange}
+        />
       </div>
     </div>
   );
