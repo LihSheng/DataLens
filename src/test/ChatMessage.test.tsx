@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ChatMessage } from "../features/chat/components/ChatMessage";
+import { useChatStore } from "../features/chat/store";
 import type { Message } from "../types";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,44 @@ const assistantMessageWithSources: Message = {
 };
 
 describe("ChatMessage", () => {
+  it("renders streaming cursor when streamState is active", () => {
+    useChatStore.setState({
+      streamState: {
+        conversationId: assistantMessage.conversationId,
+        messageId: assistantMessage.id,
+        buffer: assistantMessage.content,
+        status: "streaming",
+      },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={assistantMessage} />
+      </QueryClientProvider>,
+    );
+    // Streaming cursor is a span with bg-primary and animate-pulse
+    const streamingCursors = document.querySelectorAll(
+      "span.bg-primary.animate-pulse",
+    );
+    expect(streamingCursors.length).toBe(1);
+  });
+
+  it("does not render streaming cursor when streamState is absent", () => {
+    useChatStore.setState({ streamState: null });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ChatMessage message={assistantMessage} />
+      </QueryClientProvider>,
+    );
+    // The streaming cursor is the span with bg-primary and animate-pulse
+    // When streamState is null, no such element should exist
+    const streamingCursors = document.querySelectorAll(
+      "span.bg-primary.animate-pulse",
+    );
+    expect(streamingCursors.length).toBe(0);
+  });
+
   it("renders user message with correct styling", () => {
     render(
       <QueryClientProvider client={queryClient}>
@@ -122,33 +161,6 @@ describe("ChatMessage", () => {
     expect(
       screen.queryByRole("button", { name: /copy/i }),
     ).not.toBeInTheDocument();
-  });
-
-  it("renders streaming cursor when isStreaming is true", () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <ChatMessage message={assistantMessage} isStreaming={true} />
-      </QueryClientProvider>,
-    );
-    // Streaming cursor is a span with bg-primary and animate-pulse
-    const streamingCursors = document.querySelectorAll(
-      "span.bg-primary.animate-pulse",
-    );
-    expect(streamingCursors.length).toBe(1);
-  });
-
-  it("does not render streaming cursor when isStreaming is false", () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <ChatMessage message={assistantMessage} isStreaming={false} />
-      </QueryClientProvider>,
-    );
-    // The streaming cursor is the span with bg-primary and animate-pulse
-    // When isStreaming=false, no such element should exist
-    const streamingCursors = document.querySelectorAll(
-      "span.bg-primary.animate-pulse",
-    );
-    expect(streamingCursors.length).toBe(0);
   });
 
   it("renders citation chips for messages with sources", () => {

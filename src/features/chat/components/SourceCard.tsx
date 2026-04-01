@@ -11,15 +11,18 @@ interface SourceCardProps {
 
 export function SourceCard({ source, index }: SourceCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const { highlightedSourceId, setHighlightedSourceId } = useUIStore();
+  const highlightedSourceId = useUIStore(
+    (s) => s.sourcePanel.highlightedSourceId,
+  );
+  const highlightSource = useUIStore((s) => s.highlightSource);
 
   const sourceKey = source.id ?? `${source.documentId}_${index}`;
   const isHighlighted = highlightedSourceId === sourceKey;
 
   const handleToggle = () => {
     setExpanded((v) => !v);
-    setHighlightedSourceId(sourceKey);
-    setTimeout(() => setHighlightedSourceId(null), 1000);
+    highlightSource(sourceKey);
+    setTimeout(() => highlightSource(null), 1000);
   };
 
   const preview =

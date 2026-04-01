@@ -13,9 +13,9 @@ export function useConversations() {
     setConversations,
     addConversation,
     activeConversationId,
-    setActiveConversationId,
+    setActiveConversation,
   } = useChatStore();
-  const addToast = useUIStore((s) => s.addToast);
+  const pushToast = useUIStore((s) => s.pushToast);
 
   const query = useQuery({
     queryKey: CONVERSATIONS_KEY,
@@ -59,7 +59,7 @@ export function useConversations() {
           context.previous,
         );
       }
-      addToast("Failed to rename conversation.", "error");
+      pushToast({ message: "Failed to rename conversation.", type: "error" });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: CONVERSATIONS_KEY });
@@ -80,7 +80,7 @@ export function useConversations() {
       );
       // If deleting the active conversation, clear selection
       if (activeConversationId === id) {
-        setActiveConversationId(null);
+        setActiveConversation(null);
       }
       return { previous };
     },
@@ -91,7 +91,7 @@ export function useConversations() {
           context.previous,
         );
       }
-      addToast("Failed to delete conversation.", "error");
+      pushToast({ message: "Failed to delete conversation.", type: "error" });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: CONVERSATIONS_KEY });

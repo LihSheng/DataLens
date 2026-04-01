@@ -5,11 +5,11 @@ import { SourcePanelFooter } from "./SourcePanelFooter";
 import type { Source } from "../../../types";
 
 export function SourcePanelContent() {
-  const { activeConversationId, messages } = useChatStore();
+  const { activeConversationId, messagesByConversationId } = useChatStore();
 
   // Get sources from the last assistant message in the active conversation
   const conversationMessages = activeConversationId
-    ? (messages[activeConversationId] ?? [])
+    ? (messagesByConversationId[activeConversationId] ?? [])
     : [];
   const lastAssistantMessage = [...conversationMessages]
     .reverse()
@@ -42,9 +42,9 @@ import { X } from "lucide-react";
 import { useUIStore } from "../../../store/uiStore";
 
 export function SourcePanel() {
-  const { isSourcePanelOpen, toggleSourcePanel } = useUIStore();
+  const { sourcePanel, closeSourcePanel } = useUIStore();
 
-  if (!isSourcePanelOpen) return null;
+  if (!sourcePanel.isOpen) return null;
 
   return (
     <aside className="flex h-full w-72 flex-col border-l bg-card">
@@ -54,7 +54,7 @@ export function SourcePanel() {
           Sources
         </h2>
         <button
-          onClick={toggleSourcePanel}
+          onClick={closeSourcePanel}
           className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           aria-label="Close source panel"
         >

@@ -44,8 +44,8 @@ export function ConversationList() {
     deleteConversation,
     isDeleting,
   } = useConversations();
-  const { activeConversationId, setActiveConversationId } = useChatStore();
-  const addToast = useUIStore((s) => s.addToast);
+  const { activeConversationId, setActiveConversation } = useChatStore();
+  const pushToast = useUIStore((s) => s.pushToast);
 
   const [confirmDelete, setConfirmDelete] = useState<{
     isOpen: boolean;
@@ -85,7 +85,7 @@ export function ConversationList() {
   };
 
   const handleSelectConversation = (id: string) => {
-    setActiveConversationId(id);
+    setActiveConversation(id);
   };
 
   const handleDeleteClick = (id: string) => {
@@ -100,10 +100,11 @@ export function ConversationList() {
   const handleConfirmDelete = () => {
     if (confirmDelete.conv) {
       deleteConversation(confirmDelete.conv.id);
-      addToast(
-        `Conversation "${confirmDelete.conv.title}" deleted.`,
-        "success",
-      );
+      pushToast({
+        message: `Conversation "${confirmDelete.conv.title}" deleted.`,
+        type: "success",
+        durationMs: 4000,
+      });
     }
     setConfirmDelete({ isOpen: false, conv: null });
   };

@@ -131,8 +131,8 @@ describe("authStore", () => {
       // Simulate page reload: re-import the store (Zustand persist rehydrates from localStorage)
       // We use setState to simulate the rehydration by parsing what was stored
       const parsed = JSON.parse(stored!);
-      expect(parsed.state.isAuthenticated).toBe(true);
       expect(parsed.state.accessToken).toMatch(/^eyJhbGci/);
+      expect(parsed.state.user).toBeUndefined();
     });
   });
 });

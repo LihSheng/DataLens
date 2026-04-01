@@ -23,8 +23,8 @@ const REVEAL_DELAY_MS = 400;
 export function ChatWindow({ conversationId }: ChatWindowProps) {
   const {
     conversations,
-    messages: storeMessages,
-    isStreaming,
+    messagesByConversationId: storeMessages,
+    streamState,
     draftMessage,
     visibleFollowupMessageId,
     setDraftMessage,
@@ -57,12 +57,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   );
 
   // Identify the streaming message id (if any)
-  const streamingMessageId =
-    isStreaming && messages.length > 0
-      ? messages[messages.length - 1]?.id.startsWith("stream_")
-        ? messages[messages.length - 1].id
-        : undefined
-      : undefined;
+  const isStreaming = streamState?.status === "streaming";
 
   // Delayed reveal of follow-up suggestions once streaming completes
   useEffect(() => {
@@ -244,10 +239,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
 
         {messages.map((msg) => (
           <div key={msg.id} className="mb-4 last:mb-0">
-            <ChatMessage
-              message={msg}
-              isStreaming={isStreaming && msg.id === streamingMessageId}
-            />
+            <ChatMessage message={msg} />
             {/* Follow-up suggestions below the assistant message that just streamed */}
             {msg.role === "assistant" &&
               visibleFollowupMessageId === msg.id &&

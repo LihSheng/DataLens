@@ -12,14 +12,15 @@ export function CitationChip({
   sourceId,
   valid = true,
 }: CitationChipProps) {
-  const { isSourcePanelOpen, toggleSourcePanel, setHighlightedSourceId } =
-    useUIStore();
+  const isSourcePanelOpen = useUIStore((s) => s.sourcePanel.isOpen);
+  const openSourcePanel = useUIStore((s) => s.openSourcePanel);
+  const highlightSource = useUIStore((s) => s.highlightSource);
 
   const handleClick = () => {
     if (!isSourcePanelOpen) {
-      toggleSourcePanel();
+      openSourcePanel(sourceId);
     }
-    setHighlightedSourceId(sourceId);
+    highlightSource(sourceId);
     setTimeout(() => {
       const card = document.getElementById(`source-${sourceId}`);
       card?.scrollIntoView({ behavior: "smooth", block: "nearest" });

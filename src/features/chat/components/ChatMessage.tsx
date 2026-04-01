@@ -6,12 +6,8 @@ import { CachePill } from "./CachePill";
 import { ModelBadge } from "./ModelBadge";
 import { NoAnswerState } from "./NoAnswerState";
 import { FeedbackButtons } from "./FeedbackButtons";
+import { useChatStore } from "../store";
 import type { Message, CitationValidity } from "../../../types";
-
-interface ChatMessageProps {
-  message: Message;
-  isStreaming?: boolean;
-}
 
 function isCitationInvalid(
   citationValidity: CitationValidity[] | undefined,
@@ -85,7 +81,11 @@ function renderContentWithCitations(
   return <p className="whitespace-pre-wrap text-sm leading-relaxed">{parts}</p>;
 }
 
-export function ChatMessage({ message, isStreaming }: ChatMessageProps) {
+export function ChatMessage({ message }: { message: Message }) {
+  const streamState = useChatStore((s) => s.streamState);
+  const isStreaming = streamState?.messageId === message.id;
+  const displayText = isStreaming ? streamState!.buffer : message.content;
+  const showCursor = isStreaming && streamState?.status === "streaming";
   const isUser = message.role === "user";
   const isNoAnswer = !!message.noAnswerReason;
   const time = new Date(message.createdAt).toLocaleTimeString([], {
@@ -112,13 +112,13 @@ export function ChatMessage({ message, isStreaming }: ChatMessageProps) {
             />
           ) : (
             renderContentWithCitations(
-              message.content,
+              displayText,
               message.sources,
               message.citationValidity,
             )
           )}
           {/* Blinking cursor during stream */}
-          {isStreaming && (
+          {showCursor && (
             <span
               className="inline-block h-4 w-0.5 bg-primary animate-pulse ml-1 mb-0.5"
               aria-hidden="true"

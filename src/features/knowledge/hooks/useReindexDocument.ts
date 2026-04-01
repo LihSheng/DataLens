@@ -4,13 +4,13 @@ import { useUIStore } from "../../../store/uiStore";
 
 export function useReindexDocument() {
   const queryClient = useQueryClient();
-  const addToast = useUIStore((s) => s.addToast);
+  const pushToast = useUIStore((s) => s.pushToast);
 
   return useMutation({
     mutationFn: (documentId: string) =>
       httpClient.post(`/api/documents/${documentId}/reindex`, {}),
     onSuccess: (_, documentId) => {
-      addToast("Re-indexing started", "success");
+      pushToast({ message: "Re-indexing started", type: "success" });
       queryClient.invalidateQueries({ queryKey: ["documents"] });
       // Also update the document in the cache to "processing"
       queryClient.setQueryData(["documents"], (old: unknown) => {
@@ -21,7 +21,7 @@ export function useReindexDocument() {
       });
     },
     onError: (err: Error) => {
-      addToast(`Re-index failed: ${err.message}`, "error");
+      pushToast({ message: `Re-index failed: ${err.message}`, type: "error" });
     },
   });
 }

@@ -34,6 +34,7 @@ export interface Message {
   conversationId: string;
   role: "user" | "assistant";
   content: string;
+  status?: "streaming" | "done" | "error";
   sources?: Source[];
   createdAt: string;
   suggestedFollowups?: string[];

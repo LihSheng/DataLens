@@ -9,16 +9,19 @@ interface ShareLinkButtonProps {
 
 export function ShareLinkButton({ conversationId }: ShareLinkButtonProps) {
   const createShareLink = useCreateShareLink(conversationId);
-  const addToast = useUIStore((s) => s.addToast);
+  const pushToast = useUIStore((s) => s.pushToast);
 
   const handleClick = async () => {
     try {
       const result = await createShareLink.mutateAsync();
       const shareUrl = `${window.location.origin}/share/${result.token}`;
       await navigator.clipboard.writeText(shareUrl);
-      addToast("Share link copied to clipboard!", "success");
+      pushToast({
+        message: "Share link copied to clipboard!",
+        type: "success",
+      });
     } catch {
-      addToast("Failed to create share link.", "error");
+      pushToast({ message: "Failed to create share link.", type: "error" });
     }
   };
 

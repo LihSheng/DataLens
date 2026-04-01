@@ -13,7 +13,7 @@ interface SubmitFeedbackParams {
 
 export function useSubmitFeedback() {
   const accessToken = useAuthStore((s) => s.accessToken);
-  const addToast = useUIStore((s) => s.addToast);
+  const pushToast = useUIStore((s) => s.pushToast);
 
   return useMutation({
     mutationFn: async (params: SubmitFeedbackParams) => {
@@ -33,7 +33,10 @@ export function useSubmitFeedback() {
       return response.json();
     },
     onError: (error: Error) => {
-      addToast(`Failed to submit feedback: ${error.message}`, "error");
+      pushToast({
+        message: `Failed to submit feedback: ${error.message}`,
+        type: "error",
+      });
     },
   });
 }

@@ -12,7 +12,7 @@ import type { Document, DocumentStatus, DocumentRecord } from "../types";
 
 export function KnowledgeBasePage() {
   const queryClient = useQueryClient();
-  const addToast = useUIStore((s) => s.addToast);
+  const pushToast = useUIStore((s) => s.pushToast);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<DocumentStatus | "all">(
@@ -55,7 +55,10 @@ export function KnowledgeBasePage() {
       if (previous !== undefined) {
         queryClient.setQueryData<Document[]>(["documents"], previous);
       }
-      addToast("Failed to delete document. Please try again.", "error");
+      pushToast({
+        message: "Failed to delete document. Please try again.",
+        type: "error",
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["documents"] });

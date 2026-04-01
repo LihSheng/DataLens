@@ -16,7 +16,7 @@ export function useDocumentAcl(documentId: string) {
 
 export function useUpdateDocumentAcl() {
   const queryClient = useQueryClient();
-  const addToast = useUIStore((s) => s.addToast);
+  const pushToast = useUIStore((s) => s.pushToast);
 
   return useMutation({
     mutationFn: ({
@@ -32,10 +32,13 @@ export function useUpdateDocumentAcl() {
         ["documents", data.data.documentId, "acl"],
         data.data,
       );
-      addToast("Access control updated", "success");
+      pushToast({ message: "Access control updated", type: "success" });
     },
     onError: (err: Error) => {
-      addToast(`Failed to update ACL: ${err.message}`, "error");
+      pushToast({
+        message: `Failed to update ACL: ${err.message}`,
+        type: "error",
+      });
     },
   });
 }

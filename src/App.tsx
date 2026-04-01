@@ -18,6 +18,7 @@ import { Loader } from "./components/Loader";
 import { Toast } from "./components/ui/Toast";
 import { useAuthStore } from "./features/auth/store";
 import { config } from "./lib/config";
+import { httpClient } from "./services/httpClient";
 
 const LoginPage = lazy(() =>
   import("./pages/LoginPage").then((m) => ({ default: m.LoginPage })),
@@ -312,6 +313,17 @@ function AppRoutes() {
 
 export default function App() {
   const { isDarkMode } = useUIStore();
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const setUser = useAuthStore((s) => s._setUser);
+  const logout = useAuthStore((s) => s.logout);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    httpClient
+      .get("/api/me")
+      .then((res) => setUser(res.data))
+      .catch(() => logout());
+  }, [accessToken, setUser, logout]);
 
   return (
     <GlobalErrorBoundary>

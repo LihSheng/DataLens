@@ -18,13 +18,11 @@ export function ConversationSearchResults({
   isError,
   query,
 }: ConversationSearchResultsProps) {
-  const setActiveConversationId = useChatStore(
-    (s) => s.setActiveConversationId,
-  );
+  const setActiveConversation = useChatStore((s) => s.setActiveConversation);
   const navigate = useNavigate();
 
   const handleSelect = (id: string) => {
-    setActiveConversationId(id);
+    setActiveConversation(id);
     navigate(`/`);
   };
 

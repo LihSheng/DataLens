@@ -16,14 +16,15 @@ export function ChatPage() {
   const {
     isConversationsDrawerOpen,
     toggleConversationsDrawer,
-    isSourcePanelOpen,
-    toggleSourcePanel,
+    sourcePanel,
+    openSourcePanel,
+    closeSourcePanel,
   } = useUIStore();
 
   // Auto-select first conversation if none selected
   useEffect(() => {
     if (!activeConversationId && conversations && conversations.length > 0) {
-      useChatStore.getState().setActiveConversationId(conversations[0].id);
+      useChatStore.getState().setActiveConversation(conversations[0].id);
     }
   }, [activeConversationId, conversations]);
 
@@ -65,17 +66,17 @@ export function ChatPage() {
       </div>
 
       {/* Source panel — desktop side panel, mobile drawer */}
-      {isSourcePanelOpen && (
+      {sourcePanel.isOpen && (
         <div className="fixed inset-0 z-40 flex lg:hidden">
           <div
             className="fixed inset-0 bg-black/50"
-            onClick={toggleSourcePanel}
+            onClick={closeSourcePanel}
           />
           <div className="relative z-50 ml-auto h-full w-4/5 max-w-sm border-l bg-card shadow-xl flex flex-col">
             <div className="flex items-center justify-between p-3 border-b">
               <h2 className="text-sm font-semibold">Sources</h2>
               <button
-                onClick={toggleSourcePanel}
+                onClick={closeSourcePanel}
                 className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 aria-label="Close sources panel"
               >
@@ -96,7 +97,9 @@ export function ChatPage() {
 
       {/* Mobile: Source panel toggle button */}
       <button
-        onClick={toggleSourcePanel}
+        onClick={() =>
+          sourcePanel.isOpen ? closeSourcePanel() : openSourcePanel()
+        }
         className="fixed bottom-24 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg lg:hidden"
         aria-label="Toggle sources panel"
       >

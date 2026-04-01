@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useKnowledgeStore } from "../store";
+import { useDocumentStore } from "../store";
 import { useUIStore } from "../../../store/uiStore";
 import { uploadDocument } from "../../../services/api/documents";
 
@@ -20,8 +20,8 @@ function isAccepted(file: File): boolean {
 
 export function useUpload() {
   const queryClient = useQueryClient();
-  const { uploadQueue, addUploadItem, updateUploadItem } = useKnowledgeStore();
-  const addToast = useUIStore((s) => s.addToast);
+  const { uploadQueue, addUploadItem, updateUploadItem } = useDocumentStore();
+  const pushToast = useUIStore((s) => s.pushToast);
 
   const isUploading = uploadQueue.some(
     (u) => u.status === "uploading" || u.status === "processing",
@@ -61,11 +61,14 @@ export function useUpload() {
           .catch(() => {
             clearInterval(intervalId);
             updateUploadItem(id, { status: "failed" });
-            addToast(`Failed to upload "${file.name}"`, "error");
+            pushToast({
+              message: `Failed to upload "${file.name}"`,
+              type: "error",
+            });
           });
       }
     },
-    [addUploadItem, updateUploadItem, queryClient, addToast],
+    [addUploadItem, updateUploadItem, queryClient, pushToast],
   );
 
   return { uploadFiles, uploadQueue, isUploading };

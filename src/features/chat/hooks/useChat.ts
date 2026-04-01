@@ -20,14 +20,19 @@ export function useMessages(conversationId: string | null) {
 export function useSendMessage() {
   const queryClient = useQueryClient();
   const {
-    addMessage,
-    updateStreamingMessage,
-    setIsStreaming,
+    addOptimisticUserMessage,
+    appendMessage,
+    startStream,
+    appendStreamChunk,
+    finaliseStream,
+    failStream,
     activeConversationId,
     activeFilters,
   } = useChatStore();
   const accessToken = useAuthStore((s) => s.accessToken);
-  const addToast = useUIStore((s) => s.addToast);
+  const pushToast = useUIStore((s) => s.pushToast);
+  const openSourcePanel = useUIStore((s) => s.openSourcePanel);
+  const highlightSource = useUIStore((s) => s.highlightSource);
 
   const mutation = useMutation({
     mutationFn: async (params: {
@@ -38,19 +43,20 @@ export function useSendMessage() {
         params.conversationId ?? activeConversationId ?? "conv_new";
 
       // Optimistically add user message
-      const optimisticUserMessage: Message = {
-        id: `optimistic_${Date.now()}`,
-        conversationId: currentConversationId,
-        role: "user",
-        content: params.message,
-        createdAt: new Date().toISOString(),
-      };
-      addMessage(currentConversationId, optimisticUserMessage);
-
-      setIsStreaming(true);
+      addOptimisticUserMessage(currentConversationId, params.message);
 
       // Start streaming response
-      const assistantMessageId = `stream_${Date.now()}`;
+      const assistantMessageId = crypto.randomUUID();
+      appendMessage(currentConversationId, {
+        id: assistantMessageId,
+        conversationId: currentConversationId,
+        role: "assistant",
+        content: "",
+        status: "streaming",
+        sources: [],
+        createdAt: new Date().toISOString(),
+      });
+      startStream(currentConversationId, assistantMessageId);
       let assistantContent = "";
       const sources: Message["sources"] = [];
       let suggestedFollowups: string[] | undefined;
@@ -100,12 +106,7 @@ export function useSendMessage() {
 
           if (data.content !== undefined) {
             assistantContent += data.content;
-            updateStreamingMessage(
-              currentConversationId,
-              assistantMessageId,
-              assistantContent,
-              data.suggestedFollowups,
-            );
+            appendStreamChunk(data.content);
           }
           if (data.sources) {
             // Assign stable ids to sources for citation linking
@@ -127,18 +128,11 @@ export function useSendMessage() {
           if (data.tokenUsage) tokenUsage = data.tokenUsage;
         }
       } finally {
-        setIsStreaming(false);
         reader.releaseLock();
       }
 
-      // Replace optimistic with real assistant message
-      const realAssistantMessage: Message = {
-        id: assistantMessageId,
-        conversationId: currentConversationId,
-        role: "assistant",
-        content: assistantContent,
+      finaliseStream({
         sources: sources.length > 0 ? sources : undefined,
-        createdAt: new Date().toISOString(),
         suggestedFollowups,
         confidence,
         grounding,
@@ -148,7 +142,12 @@ export function useSendMessage() {
         noAnswerReason,
         citationValidity,
         tokenUsage,
-      };
+      });
+
+      if (sources.length > 0) {
+        openSourcePanel();
+        highlightSource(sources[0].id ?? `${sources[0].documentId}_0`);
+      }
 
       // Invalidate messages so they re-fetch from MSW cache
       queryClient.invalidateQueries({
@@ -156,11 +155,14 @@ export function useSendMessage() {
       });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
 
-      return realAssistantMessage;
+      return assistantContent;
     },
     onError: (error: Error) => {
-      setIsStreaming(false);
-      addToast(`Failed to send message: ${error.message}`, "error");
+      failStream(error.message);
+      pushToast({
+        message: `Failed to send message: ${error.message}`,
+        type: "error",
+      });
     },
   });
 

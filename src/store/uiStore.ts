@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 type Toast = {
   id: string;
   message: string;
-  type: "success" | "error" | "info";
+  type: "success" | "error" | "info" | "warning";
+  durationMs: number;
 };
 
 interface UIState {
@@ -14,70 +14,102 @@ interface UIState {
   activeModal: string | null;
   toasts: Toast[];
   isDarkMode: boolean;
-  isSourcePanelOpen: boolean;
-  highlightedSourceId: string | null;
+  sourcePanel: {
+    isOpen: boolean;
+    highlightedSourceId: string | null;
+  };
+  openSidebar: () => void;
+  closeSidebar: () => void;
   toggleSidebar: () => void;
   toggleSidebarCollapse: () => void;
   toggleConversationsDrawer: () => void;
-  setActiveModal: (modal: string | null) => void;
-  addToast: (message: string, type?: Toast["type"]) => void;
-  removeToast: (id: string) => void;
+  openModal: (modal: string | null) => void;
+  closeModal: () => void;
+  pushToast: (toast: Omit<Toast, "id"> & { durationMs?: number }) => string;
+  dismissToast: (id: string) => void;
   toggleDarkMode: () => void;
-  toggleSourcePanel: () => void;
-  setHighlightedSourceId: (id: string | null) => void;
+  openSourcePanel: (highlightedId?: string) => void;
+  closeSourcePanel: () => void;
+  highlightSource: (sourceId: string | null) => void;
   resetSettings: () => void;
 }
 
-export const useUIStore = create<UIState>()(
-  persist(
-    (set) => ({
-      isSidebarOpen: true,
-      isSidebarCollapsed: false,
-      isConversationsDrawerOpen: false,
-      activeModal: null,
-      toasts: [],
-      isDarkMode: localStorage.getItem("theme") === "dark",
-      isSourcePanelOpen: false,
-      highlightedSourceId: null,
+export const useUIStore = create<UIState>()((set) => ({
+  isSidebarOpen: true,
+  isSidebarCollapsed: false,
+  isConversationsDrawerOpen: false,
+  activeModal: null,
+  toasts: [],
+  isDarkMode: localStorage.getItem("theme") === "dark",
+  sourcePanel: {
+    isOpen: false,
+    highlightedSourceId: null,
+  },
 
-      toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
-      toggleSidebarCollapse: () =>
-        set((s) => ({ isSidebarCollapsed: !s.isSidebarCollapsed })),
-      toggleConversationsDrawer: () =>
-        set((s) => ({
-          isConversationsDrawerOpen: !s.isConversationsDrawerOpen,
-        })),
-      setActiveModal: (modal) => set({ activeModal: modal }),
-      addToast: (message, type = "info") =>
-        set((s) => ({
-          toasts: [...s.toasts, { id: Date.now().toString(), message, type }],
-        })),
-      removeToast: (id) =>
-        set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
-      toggleDarkMode: () =>
-        set((s) => {
-          const next = !s.isDarkMode;
-          if (next) {
-            document.documentElement.classList.add("dark");
-            localStorage.setItem("theme", "dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-            localStorage.setItem("theme", "light");
-          }
-          return { isDarkMode: next };
-        }),
-      toggleSourcePanel: () =>
-        set((s) => ({ isSourcePanelOpen: !s.isSourcePanelOpen })),
-      setHighlightedSourceId: (id) => set({ highlightedSourceId: id }),
-      resetSettings: () =>
-        set({ isSourcePanelOpen: false, highlightedSourceId: null }),
+  openSidebar: () => set({ isSidebarOpen: true }),
+  closeSidebar: () => set({ isSidebarOpen: false }),
+  toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
+  toggleSidebarCollapse: () =>
+    set((s) => ({ isSidebarCollapsed: !s.isSidebarCollapsed })),
+  toggleConversationsDrawer: () =>
+    set((s) => ({
+      isConversationsDrawerOpen: !s.isConversationsDrawerOpen,
+    })),
+  openModal: (modal) => set({ activeModal: modal }),
+  closeModal: () => set({ activeModal: null }),
+  pushToast: (toast) => {
+    const id = Date.now().toString();
+    set((s) => ({
+      toasts: [
+        ...s.toasts,
+        {
+          ...toast,
+          durationMs: toast.durationMs ?? 4000,
+          id,
+        },
+      ],
+    }));
+    return id;
+  },
+  dismissToast: (id) =>
+    set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
+  toggleDarkMode: () =>
+    set((s) => {
+      const next = !s.isDarkMode;
+      if (next) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      return { isDarkMode: next };
     }),
-    {
-      name: "ui-store",
-      partialize: (s) => ({
-        isSidebarCollapsed: s.isSidebarCollapsed,
-        isDarkMode: s.isDarkMode,
-      }),
-    },
-  ),
-);
+  openSourcePanel: (highlightedId) =>
+    set((s) => ({
+      sourcePanel: {
+        isOpen: true,
+        highlightedSourceId: highlightedId ?? s.sourcePanel.highlightedSourceId,
+      },
+    })),
+  closeSourcePanel: () =>
+    set((s) => ({
+      sourcePanel: {
+        ...s.sourcePanel,
+        isOpen: false,
+        highlightedSourceId: null,
+      },
+    })),
+  highlightSource: (sourceId) =>
+    set((s) => ({
+      sourcePanel: { ...s.sourcePanel, highlightedSourceId: sourceId },
+    })),
+  resetSettings: () =>
+    set((s) => ({
+      sourcePanel: {
+        ...s.sourcePanel,
+        isOpen: false,
+        highlightedSourceId: null,
+      },
+    })),
+}));

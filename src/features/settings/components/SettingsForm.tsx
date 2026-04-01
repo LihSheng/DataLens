@@ -48,7 +48,7 @@ export function SettingsForm() {
     updateSettings: updateStoreSettings,
     resetSettings: resetStoreSettings,
   } = useSettingsStore();
-  const { addToast } = useUIStore();
+  const { pushToast } = useUIStore();
 
   const { data: serverSettings } = useQuery({
     queryKey: ["settings"],
@@ -177,10 +177,13 @@ export function SettingsForm() {
     onSuccess: (data) => {
       updateStoreSettings(data);
       queryClient.setQueryData(["settings"], data);
-      addToast("Settings saved", "success");
+      pushToast({ message: "Settings saved", type: "success" });
     },
     onError: (error: Error) => {
-      addToast(`Failed to save settings: ${error.message}`, "error");
+      pushToast({
+        message: `Failed to save settings: ${error.message}`,
+        type: "error",
+      });
     },
   });
 

@@ -8,7 +8,7 @@ interface UploadItem {
   status: "uploading" | "processing" | "done" | "failed";
 }
 
-interface KnowledgeState {
+interface DocumentState {
   documents: Document[];
   uploadQueue: UploadItem[];
 
@@ -21,7 +21,7 @@ interface KnowledgeState {
   removeUploadItem: (id: string) => void;
 }
 
-export const useKnowledgeStore = create<KnowledgeState>()((set) => ({
+export const useDocumentStore = create<DocumentState>()((set) => ({
   documents: [],
   uploadQueue: [],
 
@@ -57,3 +57,6 @@ export const useKnowledgeStore = create<KnowledgeState>()((set) => ({
       uploadQueue: s.uploadQueue.filter((u) => u.id !== id),
     })),
 }));
+
+// Backward-compatible alias
+export const useKnowledgeStore = useDocumentStore;

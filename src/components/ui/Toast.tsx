@@ -1,11 +1,12 @@
 import { useEffect } from "react";
-import { CheckCircle, XCircle, Info, X } from "lucide-react";
+import { CheckCircle, XCircle, Info, X, AlertTriangle } from "lucide-react";
 import { useUIStore } from "../../store/uiStore";
 
 const ICONS = {
   success: CheckCircle,
   error: XCircle,
   info: Info,
+  warning: AlertTriangle,
 };
 
 const STYLES = {
@@ -14,17 +15,20 @@ const STYLES = {
   error:
     "bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200",
   info: "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200",
+  warning:
+    "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-200",
 };
 
 const ICON_STYLES = {
   success: "text-green-500",
   error: "text-red-500",
   info: "text-blue-500",
+  warning: "text-amber-500",
 };
 
 export function Toast() {
   const toasts = useUIStore((s) => s.toasts);
-  const removeToast = useUIStore((s) => s.removeToast);
+  const dismissToast = useUIStore((s) => s.dismissToast);
 
   return (
     <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none">
@@ -34,7 +38,8 @@ export function Toast() {
           id={toast.id}
           message={toast.message}
           type={toast.type}
-          onDismiss={removeToast}
+          durationMs={toast.durationMs}
+          onDismiss={dismissToast}
         />
       ))}
     </div>
@@ -44,17 +49,24 @@ export function Toast() {
 interface ToastItemProps {
   id: string;
   message: string;
-  type: "success" | "error" | "info";
+  type: "success" | "error" | "info" | "warning";
+  durationMs: number;
   onDismiss: (id: string) => void;
 }
 
-function ToastItem({ id, message, type, onDismiss }: ToastItemProps) {
+function ToastItem({
+  id,
+  message,
+  type,
+  durationMs,
+  onDismiss,
+}: ToastItemProps) {
   const Icon = ICONS[type];
 
   useEffect(() => {
-    const timer = setTimeout(() => onDismiss(id), 4000);
+    const timer = setTimeout(() => onDismiss(id), durationMs);
     return () => clearTimeout(timer);
-  }, [id, onDismiss]);
+  }, [id, onDismiss, durationMs]);
 
   return (
     <div

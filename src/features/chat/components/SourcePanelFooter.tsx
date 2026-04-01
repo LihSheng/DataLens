@@ -4,10 +4,10 @@ import { ContextUsageSummary } from "./ContextUsageSummary";
 import type { TokenUsage } from "../../../types";
 
 export function SourcePanelFooter() {
-  const { activeConversationId, messages } = useChatStore();
+  const { activeConversationId, messagesByConversationId } = useChatStore();
 
   const conversationMessages = activeConversationId
-    ? (messages[activeConversationId] ?? [])
+    ? (messagesByConversationId[activeConversationId] ?? [])
     : [];
   const lastAssistantMessage = [...conversationMessages]
     .reverse()

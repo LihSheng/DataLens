@@ -48,6 +48,8 @@ interface AuthState {
   error: string | null;
   login: (credentials: AuthCredentials) => Promise<void>;
   logout: () => void;
+  setToken: (token: string | null) => void;
+  _setUser: (user: User | null) => void;
   clearError: () => void;
 }
 
@@ -127,15 +129,31 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
+      setToken: (token) =>
+        set({
+          accessToken: token,
+          isAuthenticated: !!token,
+        }),
+
+      _setUser: (user) =>
+        set({
+          user,
+          isAuthenticated: !!user || !!useAuthStore.getState().accessToken,
+        }),
+
       clearError: () => set({ error: null }),
     }),
     {
       name: "auth-storage",
       partialize: (s) => ({
-        user: s.user,
         accessToken: s.accessToken,
-        isAuthenticated: s.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        const token = state?.accessToken;
+        if (token) {
+          state?.setToken(token);
+        }
+      },
     },
   ),
 );
