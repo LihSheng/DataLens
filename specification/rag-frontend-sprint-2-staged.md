@@ -382,7 +382,7 @@ n  - HyDE
 
 ---
 
-## Stage S2.6 — Message Feedback Loop
+## Stage S2.6 — Message Feedback Loop ✅ DONE
 
 **Goal:** Capture explicit user feedback on answer quality and prepare data for later observability views.
 
@@ -423,7 +423,7 @@ n  - HyDE
 
 ---
 
-## Stage S2.7 — Conversation Search + Export / Share
+## Stage S2.7 — Conversation Search + Export / Share ✅ DONE
 
 **Goal:** Improve conversation usability beyond the current single-session chat flow.
 
@@ -466,7 +466,7 @@ n  - HyDE
 
 ---
 
-## Stage S2.8 — Admin Observability Additions
+## Stage S2.8 — Admin Observability Additions ✅ DONE
 
 **Goal:** Extend the existing observability/admin experience with the most useful frontend surfaces required by the TODO file.
 
@@ -521,7 +521,7 @@ n  - HyDE
 
 ---
 
-## Stage S2.9 — Admin Document Governance UI
+## Stage S2.9 — Admin Document Governance UI ✅ DONE
 
 **Goal:** Surface governance features that directly affect frontend document management.
 
@@ -557,7 +557,7 @@ n  - HyDE
 
 ---
 
-## Stage S2.10 — MSW, Testing, and Integration Hardening
+## Stage S2.10 — MSW, Testing, and Integration Hardening ✅ DONE
 
 **Goal:** Make Sprint 2 features stable enough for iterative backend integration.
 
@@ -600,11 +600,11 @@ n  - HyDE
 | S2.3 | P1 | Improves conversation continuity and engagement | ✅ DONE |
 | S2.4 | P0 | Adds answer trust and fallback clarity | ✅ DONE |
 | S2.5 | P1 | Useful power-user visibility with low UI risk | ✅ DONE |
-| S2.6 | P0 | Required foundation for feedback loop and later evals |
-| S2.7 | P1 | High user value once core trust/feedback features exist |
-| S2.8 | P2 | Admin-facing, can land after end-user improvements |
-| S2.9 | P2 | Governance/admin flows can follow later in the sprint |
-| S2.10 | P0 | Prevents unstable integration and regression |
+| S2.6 | P0 | Required foundation for feedback loop and later evals | ✅ DONE |
+| S2.7 | P1 | High user value once core trust/feedback features exist | ✅ DONE |
+| S2.8 | P2 | Admin-facing, can land after end-user improvements | ✅ DONE |
+| S2.9 | P2 | Governance/admin flows can follow later in the sprint | ✅ DONE |
+| S2.10 | P0 | Prevents unstable integration and regression | ✅ DONE |
 
 ---
 
@@ -617,11 +617,11 @@ n  - HyDE
 | S2.3 | Conversation continuity | Memory indicator + suggested follow-up pills | ✅ DONE |
 | S2.4 | Trust signals | Confidence, grounding, citation warnings, no-answer state | ✅ DONE |
 | S2.5 | Context visibility | Token usage footer in source panel | ✅ DONE |
-| S2.6 | Feedback loop | Thumbs up/down with optional negative comment |
-| S2.7 | Conversation utilities | Search, export, share, read-only shared page |
-| S2.8 | Observability | Evaluation, feedback, cost, audit frontend surfaces |
-| S2.9 | Governance | ACL panel, retention field, erasure action |
-| S2.10 | Hardening | MSW contracts + tests for all new Sprint 2 features |
+| S2.6 | Feedback loop | Thumbs up/down with optional negative comment | ✅ DONE |
+| S2.7 | Conversation utilities | Search, export, share, read-only shared page | ✅ DONE |
+| S2.8 | Observability | Evaluation, feedback, cost, audit frontend surfaces | ✅ DONE |
+| S2.9 | Governance | ACL panel, retention field, erasure action | ✅ DONE |
+| S2.10 | Hardening | MSW contracts + tests for all new Sprint 2 features | ✅ DONE |
 
 ---
 
