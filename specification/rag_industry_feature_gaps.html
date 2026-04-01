@@ -1,0 +1,145 @@
+
+<style>
+  .wrap{padding:8px 0;font-family:var(--font-sans)}
+  .legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+  .leg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary)}
+  .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .section{margin-bottom:6px;border:0.5px solid var(--color-border-tertiary);border-radius:12px;overflow:hidden}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;background:var(--color-background-secondary)}
+  .sec-head:hover{background:var(--color-background-tertiary)}
+  .sec-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+  .sec-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+  .chevron{font-size:12px;color:var(--color-text-tertiary);transition:transform .2s}
+  .chevron.open{transform:rotate(90deg)}
+  .rows{display:none;border-top:0.5px solid var(--color-border-tertiary)}
+  .rows.open{display:block}
+  .row{display:grid;grid-template-columns:1fr 90px 80px;align-items:start;gap:8px;padding:9px 14px;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .row:last-child{border-bottom:none}
+  .row:hover{background:var(--color-background-secondary);cursor:pointer}
+  .feat{font-size:13px;color:var(--color-text-primary)}
+  .desc{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+  .pill{font-size:11px;padding:2px 8px;border-radius:20px;text-align:center;font-weight:500;white-space:nowrap}
+  .p-core{background:#E1F5EE;color:#085041}.p-adv{background:#EEEDFE;color:#3C3489}.p-nice{background:#F1EFE8;color:#444441}
+  .s-miss{background:#FCEBEB;color:#791F1F}.s-part{background:#FAEEDA;color:#633806}.s-done{background:#EAF3DE;color:#27500A}
+  @media(prefers-color-scheme:dark){
+    .p-core{background:#085041;color:#9FE1CB}.p-adv{background:#3C3489;color:#CECBF6}.p-nice{background:#444441;color:#D3D1C7}
+    .s-miss{background:#791F1F;color:#F7C1C1}.s-part{background:#633806;color:#FAC775}.s-done{background:#27500A;color:#C0DD97}
+  }
+</style>
+<div class="wrap">
+<div class="legend">
+  <span class="leg"><span class="dot" style="background:#1D9E75"></span>Core / must-have</span>
+  <span class="leg"><span class="dot" style="background:#534AB7"></span>Advanced / differentiator</span>
+  <span class="leg"><span class="dot" style="background:#888780"></span>Nice to have</span>
+  <span class="leg"><span class="dot" style="background:#E24B4A"></span>Missing</span>
+  <span class="leg"><span class="dot" style="background:#BA7517"></span>Partial</span>
+  <span class="leg"><span class="dot" style="background:#639922"></span>Covered</span>
+</div>
+
+<div class="section">
+  <div class="sec-head" onclick="toggle(this)">
+    <div><div class="sec-title">Retrieval pipeline</div><div class="sec-sub">How documents are found and ranked</div></div>
+    <span class="chevron">▶</span>
+  </div>
+  <div class="rows">
+    <div class="row" onclick="sendPrompt('Explain hybrid search dense + sparse BM25 for RAG')"><div><div class="feat">Hybrid search (dense + sparse)</div><div class="desc">BM25 + vector similarity combined, best of both worlds</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain reranking with cross-encoders in RAG')"><div><div class="feat">Cross-encoder reranking</div><div class="desc">Second-pass reranker (Cohere, BGE) after initial retrieval</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain query expansion and HyDE for RAG')"><div><div class="feat">Query expansion / HyDE</div><div class="desc">Generate hypothetical answers to improve embedding match</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain semantic chunking strategies for RAG')"><div><div class="feat">Semantic chunking</div><div class="desc">Chunk by topic/section, not fixed token size</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain metadata filtering in vector search for RAG')"><div><div class="feat">Metadata filtering</div><div class="desc">Filter by date, author, doc type before vector search</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain multi-query retrieval strategy in RAG')"><div><div class="feat">Multi-query retrieval</div><div class="desc">Run 3 query variants, union results, deduplicate</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head" onclick="toggle(this)">
+    <div><div class="sec-title">Ingestion pipeline</div><div class="sec-sub">Document processing before indexing</div></div>
+    <span class="chevron">▶</span>
+  </div>
+  <div class="rows">
+    <div class="row" onclick="sendPrompt('What document parsers should a production RAG use for PDF DOCX HTML')"><div><div class="feat">Multi-format parsing</div><div class="desc">PDF, DOCX, HTML, CSV, audio transcripts — not just text</div></div><span class="pill p-core">Core</span><span class="pill s-part">Partial</span></div>
+    <div class="row" onclick="sendPrompt('Explain OCR and table extraction for RAG ingestion')"><div><div class="feat">OCR + table extraction</div><div class="desc">Scanned PDFs, embedded tables as structured data</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain document versioning and re-ingestion in RAG')"><div><div class="feat">Document versioning</div><div class="desc">Track v1/v2 of same doc, avoid duplicate vectors</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain async background ingestion queue for RAG')"><div><div class="feat">Async ingestion queue</div><div class="desc">Background job queue (Celery/BullMQ) for large files</div></div><span class="pill p-core">Core</span><span class="pill s-part">Partial</span></div>
+    <div class="row" onclick="sendPrompt('Explain PII detection and redaction before RAG ingestion')"><div><div class="feat">PII detection + redaction</div><div class="desc">Strip emails, IDs, phone numbers before indexing</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain webhook and data source connector for RAG ingestion')"><div><div class="feat">Data source connectors</div><div class="desc">Confluence, Notion, Google Drive, SharePoint sync</div></div><span class="pill p-nice">Nice</span><span class="pill s-miss">Missing</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head" onclick="toggle(this)">
+    <div><div class="sec-title">Answer quality & safety</div><div class="sec-sub">Guardrails, grounding, hallucination control</div></div>
+    <span class="chevron">▶</span>
+  </div>
+  <div class="rows">
+    <div class="row" onclick="sendPrompt('Explain answer grounding check and faithfulness validation in RAG')"><div><div class="feat">Answer grounding check</div><div class="desc">Verify every claim maps to a retrieved source span</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain LLM guardrails for RAG — topic restriction and jailbreak detection')"><div><div class="feat">Input / output guardrails</div><div class="desc">Block off-topic queries, jailbreaks, toxic content</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain confidence scoring and no-answer fallback in RAG')"><div><div class="feat">Confidence + no-answer fallback</div><div class="desc">Return "I don't know" when retrieval score is low</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain citation accuracy verification in RAG responses')"><div><div class="feat">Citation accuracy</div><div class="desc">Validate [1][2] citations actually support the claim</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('What are prompt injection attacks in RAG and how to prevent them')"><div><div class="feat">Prompt injection defence</div><div class="desc">Sanitise user input + retrieved chunks before LLM</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head" onclick="toggle(this)">
+    <div><div class="sec-title">Evaluation & quality gates</div><div class="sec-sub">Automated measurement of RAG pipeline quality</div></div>
+    <span class="chevron">▶</span>
+  </div>
+  <div class="rows">
+    <div class="row" onclick="sendPrompt('Explain RAGAS evaluation metrics for RAG — faithfulness, answer relevance, context precision')"><div><div class="feat">RAGAS / automated evals</div><div class="desc">Faithfulness, context precision, answer relevance scores</div></div><span class="pill p-core">Core</span><span class="pill s-part">Partial</span></div>
+    <div class="row" onclick="sendPrompt('Explain golden dataset and regression testing for RAG')"><div><div class="feat">Golden dataset + regression</div><div class="desc">Fixed Q&A pairs; block deploys if scores regress</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain A/B testing retrieval configs in RAG — chunk size, top K, model')"><div><div class="feat">A/B retrieval experiments</div><div class="desc">Compare chunk size, top-K, model variants side by side</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain human feedback thumbs up down loop for RAG quality')"><div><div class="feat">Human feedback loop</div><div class="desc">Thumbs up/down on answers fed back to improve retrieval</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head" onclick="toggle(this)">
+    <div><div class="sec-title">Performance & cost</div><div class="sec-sub">Latency, token usage, caching</div></div>
+    <span class="chevron">▶</span>
+  </div>
+  <div class="rows">
+    <div class="row" onclick="sendPrompt('Explain semantic caching for RAG to reduce LLM calls')"><div><div class="feat">Semantic cache</div><div class="desc">Cache answers for near-duplicate queries (GPTCache / Redis)</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain token budget management and context window optimisation in RAG')"><div><div class="feat">Token budget management</div><div class="desc">Dynamic context trimming to stay under model limits</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain LLM cost tracking per query and per user in RAG')"><div><div class="feat">Per-query cost tracking</div><div class="desc">Log token usage + cost per user, per conversation</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain model routing — fast cheap model vs expensive model — for RAG')"><div><div class="feat">Model routing</div><div class="desc">Simple queries → cheap model; complex → frontier model</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head" onclick="toggle(this)">
+    <div><div class="sec-title">UX & conversation</div><div class="sec-sub">Features users expect in a production chat product</div></div>
+    <span class="chevron">▶</span>
+  </div>
+  <div class="rows">
+    <div class="row" onclick="sendPrompt('Explain conversation memory and multi-turn context in RAG')"><div><div class="feat">Multi-turn memory</div><div class="desc">Condense conversation history; inject as context</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain follow-up question suggestions in RAG chat UI')"><div><div class="feat">Suggested follow-ups</div><div class="desc">3 AI-generated follow-on questions after each answer</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain answer export and sharing for RAG chat')"><div><div class="feat">Export / share answer</div><div class="desc">Download as PDF / Markdown; shareable link</div></div><span class="pill p-nice">Nice</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain conversation search across history in RAG chat')"><div><div class="feat">Conversation search</div><div class="desc">Full-text search across all past conversations</div></div><span class="pill p-nice">Nice</span><span class="pill s-miss">Missing</span></div>
+    <div class="row"><div><div class="feat">Chat + auth + RBAC</div><div class="desc">Streaming, protected routes, role-based nav</div></div><span class="pill p-core">Core</span><span class="pill s-done">Covered</span></div>
+    <div class="row"><div><div class="feat">Source panel + citations</div><div class="desc">Cited [1][2] inline, expandable source cards</div></div><span class="pill p-core">Core</span><span class="pill s-done">Covered</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head" onclick="toggle(this)">
+    <div><div class="sec-title">Observability & governance</div><div class="sec-sub">Audit, compliance, monitoring</div></div>
+    <span class="chevron">▶</span>
+  </div>
+  <div class="rows">
+    <div class="row"><div><div class="feat">Phoenix trace integration</div><div class="desc">Span waterfall, eval results, latency badges</div></div><span class="pill p-core">Core</span><span class="pill s-done">Covered</span></div>
+    <div class="row" onclick="sendPrompt('Explain audit log for RAG — who asked what, which documents were retrieved')"><div><div class="feat">Audit log</div><div class="desc">Immutable log: user, query, retrieved docs, answer, timestamp</div></div><span class="pill p-core">Core</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain data retention and right to erasure for RAG conversation history')"><div><div class="feat">Data retention policy</div><div class="desc">Configurable TTL on conversations; right-to-erasure flow</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+    <div class="row" onclick="sendPrompt('Explain document access control — per-document permissions — in RAG')"><div><div class="feat">Document-level ACL</div><div class="desc">Per-document permissions beyond role-level RBAC</div></div><span class="pill p-adv">Advanced</span><span class="pill s-miss">Missing</span></div>
+  </div>
+</div>
+
+</div>
+<script>
+function toggle(head){
+  const rows = head.nextElementSibling;
+  const ch = head.querySelector('.chevron');
+  const open = rows.classList.toggle('open');
+  ch.classList.toggle('open', open);
+}
+</script>
