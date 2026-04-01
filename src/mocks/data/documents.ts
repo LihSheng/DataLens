@@ -1,4 +1,4 @@
-import type { Document, DocumentRecord } from "../../types";
+import type { Document, DocumentRecord, DocumentAcl } from "../../types";
 
 export const MOCK_DOCUMENTS: Document[] = [
   {
@@ -122,4 +122,72 @@ export const removeDocument = (id: string) => {
 
 export const resetDocuments = () => {
   documents = [...MOCK_DOCUMENT_RECORDS];
+};
+
+// ─── Document ACL Store ───────────────────────────────────────────────────────
+
+const DEFAULT_ACLS: DocumentAcl[] = [
+  {
+    documentId: "doc_1",
+    accessMode: "all",
+    allowedRoles: [],
+    allowedUsers: [],
+  },
+  {
+    documentId: "doc_2",
+    accessMode: "roles",
+    allowedRoles: ["admin", "analyst"],
+    allowedUsers: [],
+  },
+  {
+    documentId: "doc_3",
+    accessMode: "users",
+    allowedRoles: [],
+    allowedUsers: ["user_1"],
+  },
+  {
+    documentId: "doc_4",
+    accessMode: "all",
+    allowedRoles: [],
+    allowedUsers: [],
+  },
+  {
+    documentId: "doc_5",
+    accessMode: "all",
+    allowedRoles: [],
+    allowedUsers: [],
+  },
+];
+
+let acls: DocumentAcl[] = [...DEFAULT_ACLS];
+
+export const getDocumentAcl = (documentId: string): DocumentAcl | undefined =>
+  acls.find((a) => a.documentId === documentId);
+
+export const setDocumentAcl = (
+  documentId: string,
+  updates: Partial<DocumentAcl>,
+): DocumentAcl => {
+  const idx = acls.findIndex((a) => a.documentId === documentId);
+  const updated: DocumentAcl =
+    idx !== -1
+      ? { ...acls[idx], ...updates }
+      : {
+          documentId,
+          accessMode: "all",
+          allowedRoles: [],
+          allowedUsers: [],
+          ...updates,
+        };
+
+  if (idx !== -1) {
+    acls = acls.map((a) => (a.documentId === documentId ? updated : a));
+  } else {
+    acls = [...acls, updated];
+  }
+  return updated;
+};
+
+export const resetAcls = () => {
+  acls = [...DEFAULT_ACLS];
 };

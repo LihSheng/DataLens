@@ -7,6 +7,7 @@ import { VersionBadge } from "./VersionBadge";
 import { StatusBadge } from "./StatusBadge";
 import { DocumentActionMenu } from "./DocumentActionMenu";
 import { VersionHistoryDrawer } from "./VersionHistoryDrawer";
+import { DocumentDetailDrawer } from "./DocumentDetailDrawer";
 import { ReindexBanner } from "./ReindexBanner";
 import { useReindexDocument } from "../hooks/useReindexDocument";
 
@@ -42,6 +43,9 @@ export function DocumentTable({
   deleteMutationIsPending,
 }: DocumentTableProps) {
   const [versionDrawerDocId, setVersionDrawerDocId] = useState<string | null>(
+    null,
+  );
+  const [detailDrawerDoc, setDetailDrawerDoc] = useState<DocumentRecord | null>(
     null,
   );
   const reindexMutation = useReindexDocument();
@@ -146,6 +150,7 @@ export function DocumentTable({
                 {/* Actions */}
                 <td className="px-4 py-3 text-right">
                   <DocumentActionMenu
+                    onDetails={() => setDetailDrawerDoc(doc)}
                     onVersionHistory={() => setVersionDrawerDocId(doc.id)}
                     onReindex={() => reindexMutation.mutate(doc.id)}
                     onDelete={() => onDelete(doc)}
@@ -163,6 +168,12 @@ export function DocumentTable({
         documentId={versionDrawerDocId ?? ""}
         isOpen={versionDrawerDocId !== null}
         onClose={() => setVersionDrawerDocId(null)}
+      />
+
+      <DocumentDetailDrawer
+        document={detailDrawerDoc}
+        isOpen={detailDrawerDoc !== null}
+        onClose={() => setDetailDrawerDoc(null)}
       />
     </>
   );

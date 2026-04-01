@@ -1,10 +1,12 @@
 import { http, HttpResponse } from "msw";
-import type { DocumentVersion } from "../../types";
+import type { DocumentVersion, AccessMode } from "../../types";
 import {
   getDocuments,
   addDocument,
   removeDocument,
   resetDocuments,
+  getDocumentAcl,
+  setDocumentAcl,
 } from "../data/documents";
 
 export const documentHandlers = [
@@ -168,11 +170,62 @@ export const documentHandlers = [
         updated[i] = {
           ...updated[i],
           status: "ready",
-          version: ((updated[i] as unknown as { version?: number }).version ?? 1) + 1,
+          version:
+            ((updated[i] as unknown as { version?: number }).version ?? 1) + 1,
         };
       }
     }, 3000);
     return HttpResponse.json({ success: true, documentId: id });
+  }),
+
+  // GET /api/documents/:id/acl
+  http.get("/api/documents/:id/acl", ({ params }) => {
+    const { id } = params as { id: string };
+    const docs = getDocuments();
+    if (!docs.find((d) => d.id === id)) {
+      return HttpResponse.json(
+        { message: "Document not found" },
+        { status: 404 },
+      );
+    }
+    const acl = getDocumentAcl(id) ?? {
+      documentId: id,
+      accessMode: "all" as AccessMode,
+      allowedRoles: [],
+      allowedUsers: [],
+    };
+    return HttpResponse.json(acl);
+  }),
+
+  // PUT /api/documents/:id/acl
+  http.put("/api/documents/:id/acl", async ({ params, request }) => {
+    const { id } = params as { id: string };
+    const docs = getDocuments();
+    if (!docs.find((d) => d.id === id)) {
+      return HttpResponse.json(
+        { message: "Document not found" },
+        { status: 404 },
+      );
+    }
+
+    const body = (await request.json()) as Partial<{
+      accessMode: AccessMode;
+      allowedRoles: string[];
+      allowedUsers: string[];
+    }>;
+
+    if (
+      body.accessMode !== undefined &&
+      !["all", "roles", "users"].includes(body.accessMode)
+    ) {
+      return HttpResponse.json(
+        { message: "accessMode must be 'all', 'roles', or 'users'" },
+        { status: 400 },
+      );
+    }
+
+    const updated = setDocumentAcl(id, body);
+    return HttpResponse.json(updated);
   }),
 ];
 

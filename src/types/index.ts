@@ -214,3 +214,7 @@ export type {
   AuditFilters,
   PaginatedAuditEvents,
 } from "./observability";
+
+// ─── Re-export governance types ─────────────────────────────────────────────
+export type { DocumentAcl, AccessMode } from "./governance";
+export type { DataErasureRequest } from "./governance";

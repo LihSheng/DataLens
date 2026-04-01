@@ -4,6 +4,7 @@ import { chatHandlers } from "./handlers/chat";
 import { documentHandlers } from "./handlers/documents";
 import { settingsHandlers } from "./handlers/settings";
 import { observabilityHandlers } from "./handlers/observability";
+import { userHandlers } from "./handlers/users";
 
 export const worker = setupWorker(
   ...authHandlers,
@@ -11,4 +12,5 @@ export const worker = setupWorker(
   ...documentHandlers,
   ...settingsHandlers,
   ...observabilityHandlers,
+  ...userHandlers,
 );

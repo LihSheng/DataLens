@@ -1,9 +1,27 @@
 import { httpClient } from "../../services/httpClient";
-import type { Document } from "../../types";
+import type { Document, DocumentAcl } from "../../types";
 
 export const documentsApi = {
   getDocuments: async (): Promise<Document[]> => {
     const res = await httpClient.get<Document[]>("/api/documents");
+    return res.data;
+  },
+
+  getDocumentAcl: async (documentId: string): Promise<DocumentAcl> => {
+    const res = await httpClient.get<DocumentAcl>(
+      `/api/documents/${documentId}/acl`,
+    );
+    return res.data;
+  },
+
+  updateDocumentAcl: async (
+    documentId: string,
+    acl: Partial<DocumentAcl>,
+  ): Promise<DocumentAcl> => {
+    const res = await httpClient.put<DocumentAcl>(
+      `/api/documents/${documentId}/acl`,
+      acl,
+    );
     return res.data;
   },
 };

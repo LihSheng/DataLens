@@ -15,6 +15,7 @@ interface DocumentActionMenuProps {
   onVersionHistory: () => void;
   onReindex: () => void;
   onDelete: () => void;
+  onDetails?: () => void;
   isReindexing?: boolean;
   disabled?: boolean;
 }
@@ -23,6 +24,7 @@ export function DocumentActionMenu({
   onVersionHistory,
   onReindex,
   onDelete,
+  onDetails,
   isReindexing,
   disabled,
 }: DocumentActionMenuProps) {
@@ -81,6 +83,17 @@ export function DocumentActionMenu({
             className="z-[9999] w-44 rounded-md border bg-popover shadow-md overflow-hidden"
             {...interactions.getFloatingProps()}
           >
+            {onDetails && (
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  onDetails();
+                }}
+                className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
+              >
+                Details
+              </button>
+            )}
             <button
               onClick={() => {
                 setOpen(false);

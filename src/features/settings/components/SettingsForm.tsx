@@ -9,6 +9,7 @@ import { RangeSlider } from "../../../components/ui/RangeSlider";
 import { SettingsSection } from "../../../components/SettingsSection";
 import { HelpTooltip } from "../../../components/ui/HelpTooltip";
 import { SelectField } from "../../../components/ui/SelectField";
+import { RetentionField } from "../../governance/components/RetentionField";
 import type { ChunkingStrategy, RAGSettings } from "../../../types";
 
 interface FormValues extends Omit<RAGSettings, "modelName"> {
@@ -451,39 +452,11 @@ export function SettingsForm() {
             </p>
           </div>
 
-          <div className="space-y-2">
-            <label
-              htmlFor="conversationRetentionDays"
-              className="text-sm font-medium text-foreground"
-            >
-              Conversation retention (days)
-            </label>
-            <input
-              id="conversationRetentionDays"
-              type="number"
-              min={1}
-              max={365}
-              value={formValues.conversationRetentionDays}
-              onChange={(e) =>
-                updateField(
-                  "conversationRetentionDays",
-                  parseInt(e.target.value, 10) || 30,
-                )
-              }
-              className={[
-                "w-24 h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground",
-                "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-              ].join(" ")}
-            />
-            {errors.conversationRetentionDays && (
-              <p className="text-xs text-red-500">
-                {errors.conversationRetentionDays}
-              </p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Conversations older than this will be automatically deleted.
-            </p>
-          </div>
+          <RetentionField
+            value={formValues.conversationRetentionDays}
+            onChange={(v) => updateField("conversationRetentionDays", v)}
+            error={errors.conversationRetentionDays}
+          />
         </div>
       </SettingsSection>
 
