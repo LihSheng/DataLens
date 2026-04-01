@@ -21,6 +21,7 @@ const REVEAL_DELAY_MS = 400;
 
 export function ChatWindow({ conversationId }: ChatWindowProps) {
   const {
+    conversations,
     messages: storeMessages,
     isStreaming,
     draftMessage,
@@ -167,6 +168,17 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
 
   return (
     <div className="flex h-full flex-col">
+      {/* Conversation title header */}
+      <div className="flex items-center gap-2 border-b px-4 py-3 min-h-[52px]">
+        <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <h1 className="truncate text-sm font-semibold text-foreground">
+          {conversationId
+            ? (conversations.find((c) => c.id === conversationId)?.title ??
+              "Conversation")
+            : "Conversation"}
+        </h1>
+      </div>
+
       {/* Error banner */}
       {error && (
         <div className="flex items-center justify-between gap-3 border-b border-destructive/30 bg-destructive/10 px-4 py-2.5">

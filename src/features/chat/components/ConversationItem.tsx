@@ -95,7 +95,9 @@ export function ConversationItem({
             disabled={isRenaming}
           />
         ) : (
-          <span className="truncate font-medium">{conversation.title}</span>
+          <span className="truncate font-medium" title={conversation.title}>
+            {conversation.title}
+          </span>
         )}
       </button>
 
