@@ -1,4 +1,12 @@
+import { httpClient } from "../../services/httpClient";
 import type { Document } from "../../types";
+
+export const documentsApi = {
+  getDocuments: async (): Promise<Document[]> => {
+    const res = await httpClient.get<Document[]>("/api/documents");
+    return res.data;
+  },
+};
 
 export function uploadDocument(
   file: File,

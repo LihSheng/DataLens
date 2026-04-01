@@ -49,7 +49,11 @@ export const chatApi = {
    * Returns a ReadableStream of parsed SSE data events.
    */
   sendMessage: (
-    params: { conversationId?: string; message: string },
+    params: {
+      conversationId?: string;
+      message: string;
+      filters?: import("../../types").ChatFilters;
+    },
     accessToken: string | null,
   ): ReadableStream => {
     const url = `${base}/api/chat`;

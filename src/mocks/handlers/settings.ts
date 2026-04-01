@@ -51,6 +51,68 @@ export const settingsHandlers = [
         { status: 400 },
       );
     }
+    if (
+      updates.hybridWeightDense !== undefined &&
+      (typeof updates.hybridWeightDense !== "number" ||
+        updates.hybridWeightDense < 0 ||
+        updates.hybridWeightDense > 1)
+    ) {
+      return HttpResponse.json(
+        { message: "hybridWeightDense must be between 0 and 1" },
+        { status: 400 },
+      );
+    }
+    if (
+      updates.confidenceThreshold !== undefined &&
+      (typeof updates.confidenceThreshold !== "number" ||
+        updates.confidenceThreshold < 0 ||
+        updates.confidenceThreshold > 1)
+    ) {
+      return HttpResponse.json(
+        { message: "confidenceThreshold must be between 0 and 1" },
+        { status: 400 },
+      );
+    }
+    if (
+      updates.memoryWindow !== undefined &&
+      (typeof updates.memoryWindow !== "number" ||
+        updates.memoryWindow < 1 ||
+        updates.memoryWindow > 20 ||
+        !Number.isInteger(updates.memoryWindow))
+    ) {
+      return HttpResponse.json(
+        { message: "memoryWindow must be an integer between 1 and 20" },
+        { status: 400 },
+      );
+    }
+    if (
+      updates.conversationRetentionDays !== undefined &&
+      (typeof updates.conversationRetentionDays !== "number" ||
+        updates.conversationRetentionDays < 1 ||
+        updates.conversationRetentionDays > 365 ||
+        !Number.isInteger(updates.conversationRetentionDays))
+    ) {
+      return HttpResponse.json(
+        {
+          message:
+            "conversationRetentionDays must be an integer between 1 and 365",
+        },
+        { status: 400 },
+      );
+    }
+    if (
+      updates.chunkingStrategy !== undefined &&
+      typeof updates.chunkingStrategy === "string" &&
+      !["semantic", "recursive", "fixed"].includes(updates.chunkingStrategy)
+    ) {
+      return HttpResponse.json(
+        {
+          message:
+            "chunkingStrategy must be one of 'semantic', 'recursive', or 'fixed'",
+        },
+        { status: 400 },
+      );
+    }
 
     return HttpResponse.json(updateSettings(updates));
   }),

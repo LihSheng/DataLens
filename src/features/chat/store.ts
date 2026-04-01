@@ -1,11 +1,12 @@
 import { create } from "zustand";
-import type { Conversation, Message } from "../../types";
+import type { ChatFilters, Conversation, Message } from "../../types";
 
 interface ChatState {
   conversations: Conversation[];
   activeConversationId: string | null;
   messages: Record<string, Message[]>; // keyed by conversationId
   isStreaming: boolean;
+  activeFilters: ChatFilters;
 
   setConversations: (conversations: Conversation[]) => void;
   addConversation: (conversation: Conversation) => void;
@@ -19,6 +20,8 @@ interface ChatState {
   ) => void;
   setIsStreaming: (streaming: boolean) => void;
   clearMessages: (conversationId: string) => void;
+  setActiveFilters: (filters: ChatFilters) => void;
+  clearActiveFilters: () => void;
 }
 
 export const useChatStore = create<ChatState>()((set) => ({
@@ -26,6 +29,7 @@ export const useChatStore = create<ChatState>()((set) => ({
   activeConversationId: null,
   messages: {},
   isStreaming: false,
+  activeFilters: {},
 
   setConversations: (conversations) => set({ conversations }),
 
@@ -67,4 +71,8 @@ export const useChatStore = create<ChatState>()((set) => ({
       const { [conversationId]: _omit, ...rest } = s.messages;
       return { messages: rest };
     }),
+
+  setActiveFilters: (filters) => set({ activeFilters: filters }),
+
+  clearActiveFilters: () => set({ activeFilters: {} }),
 }));

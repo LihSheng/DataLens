@@ -7,6 +7,14 @@ export const DEFAULT_RAG_SETTINGS: RAGSettings = {
   maxTokens: 2048,
   showSourcesPanel: true,
   enableStreaming: true,
+  hybridWeightDense: 0.5,
+  rerankerEnabled: false,
+  queryExpansionEnabled: false,
+  hydeEnabled: false,
+  chunkingStrategy: "semantic",
+  confidenceThreshold: 0.5,
+  memoryWindow: 5,
+  conversationRetentionDays: 30,
 };
 
 let settings: RAGSettings = { ...DEFAULT_RAG_SETTINGS };

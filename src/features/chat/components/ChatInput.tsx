@@ -86,7 +86,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
 
     return (
       <div className="relative">
-        <div className="flex items-end gap-2 rounded-xl border bg-card p-3 shadow-sm">
+        <div className="flex items-start gap-2 rounded-xl border bg-card p-3 shadow-sm">
           <textarea
             ref={textareaRef}
             value={value}

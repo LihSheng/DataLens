@@ -24,6 +24,7 @@ export function useSendMessage() {
     updateStreamingMessage,
     setIsStreaming,
     activeConversationId,
+    activeFilters,
   } = useChatStore();
   const accessToken = useAuthStore((s) => s.accessToken);
   const addToast = useUIStore((s) => s.addToast);
@@ -53,7 +54,11 @@ export function useSendMessage() {
       let assistantContent = "";
       const sources: Message["sources"] = [];
 
-      const stream = chatApi.sendMessage(params, accessToken);
+      const filters =
+        activeFilters.document_ids && activeFilters.document_ids.length > 0
+          ? activeFilters
+          : undefined;
+      const stream = chatApi.sendMessage({ ...params, filters }, accessToken);
       const reader = stream.getReader();
       const decoder = new TextDecoder();
 

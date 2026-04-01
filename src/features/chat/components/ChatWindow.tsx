@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
+import { SearchScopePicker } from "./SearchScopePicker";
 import { EmptyState } from "../../../components/EmptyState";
 import { Loader } from "../../../components/Loader";
 import { MessageSquare } from "lucide-react";
@@ -175,7 +176,10 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
 
       {/* Input */}
       <div className="border-t p-4">
-        <ChatInput onSend={handleSend} isStreaming={isStreaming} />
+        <SearchScopePicker />
+        <div className="mt-2">
+          <ChatInput onSend={handleSend} isStreaming={isStreaming} />
+        </div>
       </div>
     </div>
   );
