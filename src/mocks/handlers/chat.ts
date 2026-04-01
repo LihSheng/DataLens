@@ -1,23 +1,11 @@
 import { http, HttpResponse } from "msw";
-import {
-  MOCK_CONVERSATIONS,
-  MOCK_MESSAGES,
-  MOCK_SOURCES,
-} from "../data/conversations";
+import { MOCK_SOURCES } from "../data/conversations";
+// Shared mutable state — both files mutate the same arrays exported from
+// conversations.ts so all handlers see the same data at runtime.
+import { conversations, messages } from "./conversations";
 
-let conversations = [...MOCK_CONVERSATIONS];
-const messages: Record<string, (typeof MOCK_MESSAGES)[string]> = JSON.parse(
-  JSON.stringify(MOCK_MESSAGES),
-);
+// Allow chat.ts to add new messages to the shared messages store
 let messageIdCounter = 100;
-const feedbackStore: Array<{
-  messageId: string;
-  conversationId: string;
-  traceId: string;
-  rating: "positive" | "negative";
-  comment?: string;
-  createdAt: string;
-}> = [];
 
 export const chatHandlers = [
   // GET /api/conversations
@@ -34,7 +22,8 @@ export const chatHandlers = [
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    conversations = [newConversation, ...conversations];
+    // Mutate the shared exported array
+    conversations.push(newConversation);
     return HttpResponse.json(newConversation, { status: 201 });
   }),
 
@@ -73,7 +62,7 @@ export const chatHandlers = [
         { status: 404 },
       );
     }
-    conversations = conversations.filter((c) => c.id !== id);
+    conversations.splice(idx, 1);
     delete messages[id];
     return new Response(null, { status: 204 });
   }),
@@ -102,7 +91,7 @@ export const chatHandlers = [
     const userMessageId = `msg_${++messageIdCounter}`;
     const assistantMessageId = `msg_${++messageIdCounter}`;
 
-    // Append user message
+    // Append user message to shared store
     if (!messages[conversationId]) {
       messages[conversationId] = [];
     }
@@ -183,144 +172,6 @@ export const chatHandlers = [
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },
-    });
-  }),
-
-  // POST /api/feedback
-  http.post("/api/feedback", async ({ request }) => {
-    const body = (await request.json()) as {
-      messageId: string;
-      conversationId: string;
-      traceId: string;
-      rating: "positive" | "negative";
-      comment?: string;
-    };
-
-    if (
-      !body.messageId ||
-      !body.conversationId ||
-      !body.traceId ||
-      !body.rating
-    ) {
-      return HttpResponse.json(
-        {
-          message:
-            "messageId, conversationId, traceId, and rating are required",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (body.rating !== "positive" && body.rating !== "negative") {
-      return HttpResponse.json(
-        { message: "rating must be 'positive' or 'negative'" },
-        { status: 400 },
-      );
-    }
-
-    const feedback = {
-      messageId: body.messageId,
-      conversationId: body.conversationId,
-      traceId: body.traceId,
-      rating: body.rating,
-      comment: body.comment,
-      createdAt: new Date().toISOString(),
-    };
-
-    feedbackStore.push(feedback);
-
-    return HttpResponse.json(feedback, { status: 201 });
-  }),
-
-  // GET /api/conversations/search?q={query}
-  http.get("/api/conversations/search", ({ request }) => {
-    const url = new URL(request.url);
-    const q = url.searchParams.get("q")?.toLowerCase() ?? "";
-    if (!q) return HttpResponse.json([]);
-
-    const results = conversations
-      .filter((c) => c.title.toLowerCase().includes(q))
-      .map((c) => {
-        // Build a snippet from the first user message if available
-        const msgs = messages[c.id];
-        const firstUser = msgs?.find((m) => m.role === "user");
-        return {
-          ...c,
-          snippet: firstUser
-            ? firstUser.content.slice(0, 120) +
-              (firstUser.content.length > 120 ? "…" : "")
-            : undefined,
-        };
-      });
-
-    return HttpResponse.json(results);
-  }),
-
-  // GET /api/conversations/:id/export?format=md|pdf
-  http.get("/api/conversations/:id/export", ({ params, request }) => {
-    const { id } = params as { id: string };
-    const url = new URL(request.url);
-    const format = url.searchParams.get("format") ?? "md";
-
-    const conv = conversations.find((c) => c.id === id);
-    const convMessages = messages[id] ?? [];
-
-    const md = [
-      `# ${conv?.title ?? "Conversation"}`,
-      "",
-      ...convMessages.map((m) => {
-        const role = m.role === "user" ? "**You**" : "**Assistant**";
-        return `${role}:\n\n${m.content}`;
-      }),
-    ].join("\n\n");
-
-    if (format === "md") {
-      return new HttpResponse(md, {
-        headers: {
-          "Content-Type": "text/markdown;charset=utf-8",
-          "Content-Disposition": `attachment; filename="conversation.md"`,
-        },
-      });
-    }
-
-    // PDF falls back to markdown (no actual PDF generation in mock)
-    return new HttpResponse(md, {
-      headers: {
-        "Content-Type": "text/markdown;charset=utf-8",
-        "Content-Disposition": `attachment; filename="conversation.md"`,
-      },
-    });
-  }),
-
-  // POST /api/conversations/:id/share
-  http.post("/api/conversations/:id/share", ({ params }) => {
-    const { id } = params as { id: string };
-    const conv = conversations.find((c) => c.id === id);
-    if (!conv) {
-      return HttpResponse.json(
-        { message: "Conversation not found" },
-        { status: 404 },
-      );
-    }
-    return HttpResponse.json({
-      token: "mock_token_123",
-      url: `/share/mock_token_123`,
-    });
-  }),
-
-  // GET /api/share/:token
-  http.get("/api/share/:token", ({ params }) => {
-    const { token: _ } = params as { token: string };
-    void _; // token not used in mock — any token returns the same shared conversation
-    // Return the first conversation as the shared one for the mock token
-    const conv = conversations[0];
-    const convMessages = messages[conv.id] ?? [];
-    return HttpResponse.json({
-      id: conv.id,
-      title: conv.title,
-      messages: convMessages,
-      createdAt: conv.createdAt,
-      updatedAt: conv.updatedAt,
     });
   }),
 ];

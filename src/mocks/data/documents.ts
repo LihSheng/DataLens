@@ -60,6 +60,7 @@ export const MOCK_DOCUMENT_RECORDS: DocumentRecord[] = [
     ocrApplied: true,
     piiEntitiesFound: ["email", "phone"],
     version: 2,
+    chunkCount: 142,
   },
   {
     id: "doc_2",
@@ -71,6 +72,7 @@ export const MOCK_DOCUMENT_RECORDS: DocumentRecord[] = [
     uploadedAt: "2024-10-18T10:30:00Z",
     extension: "docx",
     version: 3,
+    chunkCount: 87,
   },
   {
     id: "doc_3",
@@ -82,6 +84,7 @@ export const MOCK_DOCUMENT_RECORDS: DocumentRecord[] = [
     extension: "md",
     restricted: true,
     version: 1,
+    chunkCount: 22,
   },
   {
     id: "doc_4",
@@ -92,6 +95,7 @@ export const MOCK_DOCUMENT_RECORDS: DocumentRecord[] = [
     uploadedAt: "2024-11-01T12:00:00Z",
     extension: "txt",
     queuePosition: 2,
+    version: 1,
   },
   {
     id: "doc_5",

@@ -148,3 +148,91 @@ test('logout → redirect to /login → protected route blocked', async ({ page 
   await expect(page).toHaveURL(/\/login/)
   await expect(page.getByLabel(/email/i)).toBeVisible()
 })
+
+// ─── Test 5: Admin retrieval settings → scoped chat → trust signals → feedback ─
+
+test('admin retrieval settings → scoped chat → trust signals → feedback', async ({ page }) => {
+  // 1. Login as admin
+  await page.goto('/login')
+  await page.getByLabel(/email/i).fill('alice@example.com')
+  await page.locator('#password').fill('password123')
+  await page.getByRole('button', { name: /sign in/i }).click()
+  await expect(page).toHaveURL('http://localhost:5173/')
+
+  // 2. Go to Settings, change TopK to 3, save
+  await page.getByRole('link', { name: /settings/i }).click()
+  await expect(page).toHaveURL(/\/settings/)
+
+  // Find the TopK input (RangeSlider or number input)
+  // The label is "Top K Retrieval" and it's a RangeSlider
+  const topKSlider = page.locator('input[type="range"]').first()
+  await expect(topKSlider).toBeVisible()
+
+  // Clear and set to 3
+  await topKSlider.fill('3')
+
+  // Save
+  await page.getByRole('button', { name: /^save$/i }).click()
+
+  // Wait for save confirmation (toast or field reset)
+  await expect(page.getByRole('button', { name: /^save$/i })).toBeEnabled()
+
+  // 3. Go to Knowledge Base, click Details on a document, verify drawer opens
+  await page.getByRole('link', { name: /knowledge base/i }).click()
+  await expect(page).toHaveURL(/\/knowledge-base/)
+
+  // Wait for document rows to load
+  await expect(page.getByText('Product Requirements Q3.pdf')).toBeVisible()
+
+  // Find and click the Details action for doc_1
+  // DocumentActionMenu is accessed via the action menu button in the last column
+  const actionMenuButtons = page.getByRole('button', { name: /more options/i })
+  await actionMenuButtons.first().click()
+
+  // Wait for dropdown to appear and click Details
+  await page.getByRole('button', { name: /details/i }).click()
+
+  // DocumentDetailDrawer should open with document name
+  await expect(page.getByText('Product Requirements Q3.pdf')).toBeVisible()
+  // OCR info should be visible since doc_1 has ocrApplied: true
+  await expect(page.getByText(/ocr/i)).toBeVisible()
+
+  // Close drawer
+  await page.getByRole('button', { name: /close/i }).first().click()
+
+  // 4. Go to Chat, send a message
+  await page.getByRole('link', { name: /chat/i }).click()
+  await expect(page).toHaveURL('http://localhost:5173/')
+
+  // Send a message
+  const chatInput = page.locator('textarea[aria-label*="chat" i], textarea[placeholder*="message" i]').first()
+  await chatInput.fill('What file formats are supported?')
+  await page.keyboard.press('Enter')
+
+  // 5. Verify confidence pill and grounding indicator appear
+  // Wait for the assistant response to stream back and render
+  await expect(page.getByText('What file formats are supported?')).toBeVisible()
+
+  // Wait for trust signal badges to appear
+  await expect(page.getByText(/high|medium|low/i).first()).toBeVisible({ timeout: 10_000 })
+  // Grounding indicator
+  await expect(page.getByText(/grounded|unverified/i).first()).toBeVisible({ timeout: 10_000 })
+
+  // 6. Find an assistant message, click thumbs down, add a comment, submit
+  // The assistant message is in the "assistant" role bubble
+  const thumbsDownButton = page.getByRole('button', { name: /bad response/i })
+  await expect(thumbsDownButton).toBeVisible()
+  await thumbsDownButton.click()
+
+  // Feedback form should appear
+  const commentTextarea = page.getByPlaceholder(/optional feedback/i)
+  await expect(commentTextarea).toBeVisible()
+  await commentTextarea.fill('The answer could be more specific.')
+
+  // Submit
+  const submitButton = page.getByRole('button', { name: /^submit$/i })
+  await submitButton.click()
+
+  // 7. Verify thank-you state
+  await expect(page.getByText(/thank you for your feedback/i)).toBeVisible()
+})
