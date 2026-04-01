@@ -1,15 +1,30 @@
 import { CopyButton } from "./CopyButton";
 import { CitationChip } from "./CitationChip";
-import type { Message } from "../../../types";
+import { ConfidencePill } from "./ConfidencePill";
+import { GroundingIndicator } from "./GroundingIndicator";
+import { CachePill } from "./CachePill";
+import { ModelBadge } from "./ModelBadge";
+import { NoAnswerState } from "./NoAnswerState";
+import type { Message, CitationValidity } from "../../../types";
 
 interface ChatMessageProps {
   message: Message;
   isStreaming?: boolean;
 }
 
+function isCitationInvalid(
+  citationValidity: CitationValidity[] | undefined,
+  index: number,
+): boolean {
+  if (!citationValidity) return false;
+  const entry = citationValidity.find((v) => v.citation === `[${index + 1}]`);
+  return entry ? !entry.valid : false;
+}
+
 function renderContentWithCitations(
   content: string,
   sources?: Message["sources"],
+  citationValidity?: CitationValidity[],
 ) {
   if (!sources || sources.length === 0) {
     return (
@@ -25,6 +40,7 @@ function renderContentWithCitations(
   while ((match = citationPattern.exec(content)) !== null) {
     const index = parseInt(match[1], 10) - 1;
     const source = sources[index];
+    const invalid = isCitationInvalid(citationValidity, index);
 
     if (lastIndex < match.index) {
       parts.push(
@@ -40,14 +56,20 @@ function renderContentWithCitations(
           key={`citation-${match.index}`}
           index={index}
           sourceId={source.id ?? `${source.documentId}_${index}`}
+          valid={!invalid}
         />,
       );
     } else {
-      parts.push(
-        <span key={`citation-${match.index}`} className="text-muted-foreground">
-          [{match[1]}]
-        </span>,
-      );
+      <span
+        key={`citation-${match.index}`}
+        className={
+          invalid
+            ? "rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 mx-0.5"
+            : "text-muted-foreground"
+        }
+      >
+        [{match[1]}]
+      </span>;
     }
 
     lastIndex = match.index + match[0].length;
@@ -64,6 +86,7 @@ function renderContentWithCitations(
 
 export function ChatMessage({ message, isStreaming }: ChatMessageProps) {
   const isUser = message.role === "user";
+  const isNoAnswer = !!message.noAnswerReason;
   const time = new Date(message.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -81,7 +104,18 @@ export function ChatMessage({ message, isStreaming }: ChatMessageProps) {
               : "bg-muted text-foreground rounded-bl-md"
           }`}
         >
-          {renderContentWithCitations(message.content, message.sources)}
+          {isNoAnswer ? (
+            <NoAnswerState
+              reason={message.noAnswerReason}
+              className="w-full max-w-sm"
+            />
+          ) : (
+            renderContentWithCitations(
+              message.content,
+              message.sources,
+              message.citationValidity,
+            )
+          )}
           {/* Blinking cursor during stream */}
           {isStreaming && (
             <span
@@ -93,7 +127,37 @@ export function ChatMessage({ message, isStreaming }: ChatMessageProps) {
             <CopyButton text={message.content} className="shrink-0" />
           )}
         </div>
-        <span className="px-1 text-xs text-muted-foreground">{time}</span>
+
+        {/* Trust signal badges — assistant only */}
+        {!isUser && !isStreaming && (
+          <div className="flex flex-wrap items-center gap-1.5 px-1">
+            {message.confidence && (
+              <ConfidencePill level={message.confidence} />
+            )}
+            {message.grounding && (
+              <GroundingIndicator grounding={message.grounding} />
+            )}
+            {message.cacheHit && <CachePill />}
+            {message.routedToModel && (
+              <ModelBadge model={message.routedToModel} />
+            )}
+            {message.latencyMs && (
+              <span className="text-xs text-muted-foreground">
+                {message.latencyMs < 1000
+                  ? `${message.latencyMs}ms`
+                  : `${(message.latencyMs / 1000).toFixed(1)}s`}
+              </span>
+            )}
+            <span className="text-xs text-muted-foreground ml-auto">
+              {time}
+            </span>
+          </div>
+        )}
+
+        {/* Timestamp for user messages / streaming */}
+        {(isUser || isStreaming) && (
+          <span className="px-1 text-xs text-muted-foreground">{time}</span>
+        )}
       </div>
     </div>
   );

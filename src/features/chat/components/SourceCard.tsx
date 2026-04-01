@@ -52,7 +52,12 @@ export function SourceCard({ source, index }: SourceCardProps) {
             <p className="text-sm font-medium leading-snug truncate">
               {source.documentName}
             </p>
-            <RelevanceScoreBadge score={source.relevanceScore} />
+            <RelevanceScoreBadge
+              score={source.relevanceScore}
+              rerankScore={
+                (source as unknown as { rerank_score?: number }).rerank_score
+              }
+            />
           </div>
           {source.pageNumber !== undefined && (
             <p className="mt-0.5 text-xs text-muted-foreground">

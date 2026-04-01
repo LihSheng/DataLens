@@ -126,10 +126,16 @@ export const chatHandlers = [
 
         const push = () => {
           if (index >= fullResponse.length) {
-            // Send sources + suggested follow-ups as final event
+            // Send sources + suggested follow-ups + trust signals as final event
             const finalEvent = `data: ${JSON.stringify({
-              sources: MOCK_SOURCES.slice(0, 2),
+              sources: MOCK_SOURCES.slice(0, 2).map((s, i) => ({
+                ...s,
+                rerankScore: i === 0 ? 0.87 : 0.72,
+              })),
               suggestedFollowups,
+              confidence: "high",
+              grounding: { fully_grounded: true, unsupported_count: 0 },
+              latencyMs: 1240,
             })}\n\n`;
             controller.enqueue(encoder.encode(finalEvent));
             controller.close();

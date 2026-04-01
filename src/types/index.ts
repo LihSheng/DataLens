@@ -23,6 +23,7 @@ export interface Source {
   chunkText: string;
   pageNumber?: number;
   relevanceScore: number;
+  rerankScore?: number;
 }
 
 export interface Message {
@@ -33,6 +34,14 @@ export interface Message {
   sources?: Source[];
   createdAt: string;
   suggestedFollowups?: string[];
+  // Trust signals
+  confidence?: ConfidenceLevel;
+  noAnswerReason?: string;
+  cacheHit?: boolean;
+  routedToModel?: string;
+  grounding?: GroundingInfo;
+  citationValidity?: CitationValidity[];
+  latencyMs?: number;
 }
 
 export interface Conversation {

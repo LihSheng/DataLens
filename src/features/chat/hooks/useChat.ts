@@ -54,6 +54,14 @@ export function useSendMessage() {
       let assistantContent = "";
       const sources: Message["sources"] = [];
       let suggestedFollowups: string[] | undefined;
+      // Trust signal state
+      let confidence: Message["confidence"];
+      let grounding: Message["grounding"];
+      let latencyMs: number | undefined;
+      let cacheHit: boolean | undefined;
+      let routedToModel: string | undefined;
+      let noAnswerReason: string | undefined;
+      let citationValidity: Message["citationValidity"];
 
       const filters =
         activeFilters.document_ids && activeFilters.document_ids.length > 0
@@ -74,9 +82,13 @@ export function useSendMessage() {
             content?: string;
             sources?: Message["sources"];
             suggestedFollowups?: string[];
-            id?: string;
-            role?: string;
-            createdAt?: string;
+            confidence?: Message["confidence"];
+            grounding?: Message["grounding"];
+            latencyMs?: number;
+            cacheHit?: boolean;
+            routedToModel?: string;
+            noAnswerReason?: string;
+            citationValidity?: Message["citationValidity"];
           };
           try {
             data = JSON.parse(raw.trim());
@@ -101,9 +113,15 @@ export function useSendMessage() {
             }));
             sources.push(...indexedSources);
           }
-          if (data.suggestedFollowups) {
+          if (data.suggestedFollowups)
             suggestedFollowups = data.suggestedFollowups;
-          }
+          if (data.confidence) confidence = data.confidence;
+          if (data.grounding) grounding = data.grounding;
+          if (data.latencyMs) latencyMs = data.latencyMs;
+          if (data.cacheHit) cacheHit = data.cacheHit;
+          if (data.routedToModel) routedToModel = data.routedToModel;
+          if (data.noAnswerReason) noAnswerReason = data.noAnswerReason;
+          if (data.citationValidity) citationValidity = data.citationValidity;
         }
       } finally {
         setIsStreaming(false);
@@ -119,6 +137,13 @@ export function useSendMessage() {
         sources: sources.length > 0 ? sources : undefined,
         createdAt: new Date().toISOString(),
         suggestedFollowups,
+        confidence,
+        grounding,
+        latencyMs,
+        cacheHit,
+        routedToModel,
+        noAnswerReason,
+        citationValidity,
       };
 
       // Invalidate messages so they re-fetch from MSW cache

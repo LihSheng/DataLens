@@ -144,19 +144,20 @@ describe("KnowledgeBasePage — search and filter composition", () => {
       ).toBeInTheDocument();
     });
 
-    // Find delete buttons inside the table (not the upload button at the top)
-    // Delete button is an icon-only button with Trash2 SVG inside a table row
+    // Find the action menu button (MoreVertical 3-dot) in the first data row
     const tableRows = screen.getAllByRole("row");
-    // Get buttons inside data rows (skip header row at index 0)
-    const dataRows = tableRows.slice(1);
-    expect(dataRows.length).toBeGreaterThan(0);
+    const firstDataRow = tableRows[1];
+    const menuButton = firstDataRow.querySelector("button");
+    expect(menuButton).not.toBeNull();
 
-    // Find the delete button (has Trash2 icon) inside the first data row
-    const firstDataRow = dataRows[0];
-    const deleteButton = firstDataRow.querySelector("button");
-    expect(deleteButton).not.toBeNull();
+    // Open the action dropdown
+    await user.click(menuButton!);
 
-    await user.click(deleteButton!);
+    // Wait for the floating dropdown to appear, then click Delete
+    const deleteButton = await waitFor(() =>
+      screen.getByRole("button", { name: /delete$/i }),
+    );
+    await user.click(deleteButton);
 
     // Confirm dialog should appear with the correct title
     await waitFor(() => {
@@ -173,10 +174,16 @@ describe("KnowledgeBasePage — search and filter composition", () => {
       ).toBeInTheDocument();
     });
 
-    // Click the first delete button in the table
+    // Open the action dropdown for the first data row
     const tableRows = screen.getAllByRole("row");
     const firstDataRow = tableRows[1];
-    const deleteButton = firstDataRow.querySelector("button")!;
+    const menuButton = firstDataRow.querySelector("button")!;
+    await user.click(menuButton);
+
+    // Click Delete from the dropdown
+    const deleteButton = await waitFor(() =>
+      screen.getByRole("button", { name: /delete$/i }),
+    );
     await user.click(deleteButton);
 
     await waitFor(() => {
