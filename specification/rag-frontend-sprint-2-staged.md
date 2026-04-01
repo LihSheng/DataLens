@@ -344,7 +344,7 @@ n  - HyDE
 
 ---
 
-## Stage S2.5 — Token / Context Visibility in Source Panel
+## Stage S2.5 — Token / Context Visibility in Source Panel ✅ DONE
 
 **Goal:** Help power users understand how much context was actually used without turning the product into a debug console.
 
@@ -599,7 +599,7 @@ n  - HyDE
 | S2.2 | P0 | Makes ingestion/document management production-ready | ✅ DONE |
 | S2.3 | P1 | Improves conversation continuity and engagement | ✅ DONE |
 | S2.4 | P0 | Adds answer trust and fallback clarity | ✅ DONE |
-| S2.5 | P1 | Useful power-user visibility with low UI risk |
+| S2.5 | P1 | Useful power-user visibility with low UI risk | ✅ DONE |
 | S2.6 | P0 | Required foundation for feedback loop and later evals |
 | S2.7 | P1 | High user value once core trust/feedback features exist |
 | S2.8 | P2 | Admin-facing, can land after end-user improvements |
@@ -616,7 +616,7 @@ n  - HyDE
 | S2.2 | Ingestion UX | OCR/PII/version badges, queue state, re-index, version drawer | ✅ DONE |
 | S2.3 | Conversation continuity | Memory indicator + suggested follow-up pills | ✅ DONE |
 | S2.4 | Trust signals | Confidence, grounding, citation warnings, no-answer state | ✅ DONE |
-| S2.5 | Context visibility | Token usage footer in source panel |
+| S2.5 | Context visibility | Token usage footer in source panel | ✅ DONE |
 | S2.6 | Feedback loop | Thumbs up/down with optional negative comment |
 | S2.7 | Conversation utilities | Search, export, share, read-only shared page |
 | S2.8 | Observability | Evaluation, feedback, cost, audit frontend surfaces |
