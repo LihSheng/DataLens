@@ -28,7 +28,7 @@ export function KnowledgeBasePage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showChunkingWarning, setShowChunkingWarning] = useState(false);
 
-  const { data: documents = [], isLoading } = useQuery<Document[]>({
+  const { data: documents = [], isLoading } = useQuery<DocumentRecord[]>({
     queryKey: ["documents"],
     queryFn: async () => {
       const res = await fetch("/api/documents");

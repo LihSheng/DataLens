@@ -168,9 +168,7 @@ export const documentHandlers = [
         updated[i] = {
           ...updated[i],
           status: "ready",
-          // @ts-expect-error version may not exist on Document but we track it in our extended store
-          version:
-            ((updated[i] as unknown as { version?: number }).version ?? 1) + 1,
+          version: ((updated[i] as unknown as { version?: number }).version ?? 1) + 1,
         };
       }
     }, 3000);

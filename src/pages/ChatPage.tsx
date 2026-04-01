@@ -55,7 +55,7 @@ export function ChatPage() {
       )}
 
       {/* Desktop: conversation list always visible at lg+ */}
-      <div className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col border-r bg-card">
+      <div className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col border-r bg-card overflow-hidden rounded-l-xl">
         <ConversationList />
       </div>
 

@@ -11,6 +11,7 @@ interface BadgeProps {
   variant?: BadgeVariant;
   children: ReactNode;
   className?: string;
+  title?: string;
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
@@ -27,6 +28,7 @@ export function Badge({
   variant = "default",
   children,
   className = "",
+  title,
 }: BadgeProps) {
   return (
     <span
@@ -35,6 +37,7 @@ export function Badge({
         variantClasses[variant],
         className,
       ].join(" ")}
+      title={title}
     >
       {children}
     </span>

@@ -121,5 +121,5 @@ export const removeDocument = (id: string) => {
 };
 
 export const resetDocuments = () => {
-  documents = [...MOCK_DOCUMENTS];
+  documents = [...MOCK_DOCUMENT_RECORDS];
 };

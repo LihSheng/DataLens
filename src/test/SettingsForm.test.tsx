@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SettingsForm } from "../features/settings/components/SettingsForm";
 import { useSettingsStore } from "../features/settings/store";
 import { useUIStore } from "../store/uiStore";
+import { DEFAULT_RAG_SETTINGS } from "../types";
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -22,14 +23,7 @@ function renderWithProviders(ui: React.ReactElement) {
 describe("SettingsForm", () => {
   it("renders all form fields with default values", () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: 0.7,
-        maxTokens: 2048,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS },
     });
     useUIStore.setState({ toasts: [] });
     renderWithProviders(<SettingsForm />);
@@ -40,14 +34,7 @@ describe("SettingsForm", () => {
 
   it("shows validation error when Top K is below 1", async () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: 0.7,
-        maxTokens: 2048,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS },
     });
     useUIStore.setState({ toasts: [] });
     const { user } = renderWithProviders(<SettingsForm />);
@@ -66,14 +53,7 @@ describe("SettingsForm", () => {
 
   it("shows validation error when Top K is above 20", async () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: 0.7,
-        maxTokens: 2048,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS },
     });
     useUIStore.setState({ toasts: [] });
     const { user } = renderWithProviders(<SettingsForm />);
@@ -92,14 +72,7 @@ describe("SettingsForm", () => {
 
   it("shows validation error when Top K is not an integer", async () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: 0.7,
-        maxTokens: 2048,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS },
     });
     useUIStore.setState({ toasts: [] });
     const { user } = renderWithProviders(<SettingsForm />);
@@ -124,14 +97,7 @@ describe("SettingsForm", () => {
   // to use a controlled-input pattern that accepts initialValue props.
   it.skip("shows validation error when temperature is below 0", async () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: -0.5,
-        maxTokens: 2048,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS, temperature: -0.5 },
     });
     useUIStore.setState({ toasts: [] });
     const { user } = renderWithProviders(<SettingsForm />);
@@ -146,14 +112,7 @@ describe("SettingsForm", () => {
 
   it.skip("shows validation error when temperature is above 2", async () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: 3.0,
-        maxTokens: 2048,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS, temperature: 3.0 },
     });
     useUIStore.setState({ toasts: [] });
     const { user } = renderWithProviders(<SettingsForm />);
@@ -168,14 +127,7 @@ describe("SettingsForm", () => {
 
   it.skip("shows validation error when max tokens is less than 1", async () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: 0.7,
-        maxTokens: 0,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS, maxTokens: 0 },
     });
     useUIStore.setState({ toasts: [] });
     const { user } = renderWithProviders(<SettingsForm />);
@@ -190,14 +142,7 @@ describe("SettingsForm", () => {
 
   it("clears field error when user modifies the field", async () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: 0.7,
-        maxTokens: 2048,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS },
     });
     useUIStore.setState({ toasts: [] });
     const { user } = renderWithProviders(<SettingsForm />);
@@ -225,14 +170,7 @@ describe("SettingsForm", () => {
 
   it("does not fire save mutation when validation fails", async () => {
     useSettingsStore.setState({
-      settings: {
-        modelName: "gpt-4o-mini",
-        topK: 5,
-        temperature: 0.7,
-        maxTokens: 2048,
-        showSourcesPanel: true,
-        enableStreaming: true,
-      },
+      settings: { ...DEFAULT_RAG_SETTINGS },
     });
     useUIStore.setState({ toasts: [] });
     const { user } = renderWithProviders(<SettingsForm />);
