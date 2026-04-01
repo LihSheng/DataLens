@@ -47,6 +47,15 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const isUserScrolledRef = useRef(false);
 
+  const scrollThreadToBottom = (behavior: ScrollBehavior = "smooth") => {
+    const container = scrollRef.current;
+    if (!container) return;
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior,
+    });
+  };
+
   // Use store messages for optimistic updates, fall back to query messages
   const messages: Message[] = useMemo(
     () =>
@@ -100,14 +109,14 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (!isStreaming && !isUserScrolledRef.current) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      scrollThreadToBottom("smooth");
     }
   }, [messages, isStreaming]);
 
   // Scroll to bottom when streaming starts
   useEffect(() => {
     if (isStreaming) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      scrollThreadToBottom("smooth");
     }
   }, [isStreaming]);
 

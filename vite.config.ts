@@ -11,5 +11,11 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     allowedHosts: ['rag.lihsheng.space'],
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8010',
+        changeOrigin: true,
+      },
+    },
   },
 })
