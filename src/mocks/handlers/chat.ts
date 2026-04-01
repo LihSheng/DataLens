@@ -136,6 +136,12 @@ export const chatHandlers = [
               confidence: "high",
               grounding: { fully_grounded: true, unsupported_count: 0 },
               latencyMs: 1240,
+              tokenUsage: {
+                used: 1842,
+                available: 3000,
+                chunksIncluded: 3,
+                chunksAvailable: 5,
+              },
             })}\n\n`;
             controller.enqueue(encoder.encode(finalEvent));
             controller.close();

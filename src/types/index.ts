@@ -42,6 +42,7 @@ export interface Message {
   grounding?: GroundingInfo;
   citationValidity?: CitationValidity[];
   latencyMs?: number;
+  tokenUsage?: TokenUsage;
 }
 
 export interface Conversation {

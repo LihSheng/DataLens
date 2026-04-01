@@ -62,6 +62,7 @@ export function useSendMessage() {
       let routedToModel: string | undefined;
       let noAnswerReason: string | undefined;
       let citationValidity: Message["citationValidity"];
+      let tokenUsage: Message["tokenUsage"];
 
       const filters =
         activeFilters.document_ids && activeFilters.document_ids.length > 0
@@ -122,6 +123,7 @@ export function useSendMessage() {
           if (data.routedToModel) routedToModel = data.routedToModel;
           if (data.noAnswerReason) noAnswerReason = data.noAnswerReason;
           if (data.citationValidity) citationValidity = data.citationValidity;
+          if (data.tokenUsage) tokenUsage = data.tokenUsage;
         }
       } finally {
         setIsStreaming(false);
@@ -144,6 +146,7 @@ export function useSendMessage() {
         routedToModel,
         noAnswerReason,
         citationValidity,
+        tokenUsage,
       };
 
       // Invalidate messages so they re-fetch from MSW cache

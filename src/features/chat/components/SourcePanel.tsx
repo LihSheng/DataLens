@@ -1,6 +1,7 @@
 import { FileText } from "lucide-react";
 import { useChatStore } from "../store";
 import { SourceCard } from "./SourceCard";
+import { SourcePanelFooter } from "./SourcePanelFooter";
 import type { Source } from "../../../types";
 
 export function SourcePanelContent() {
@@ -62,6 +63,7 @@ export function SourcePanel() {
       </div>
 
       <SourcePanelContent />
+      <SourcePanelFooter />
     </aside>
   );
 }
