@@ -5,6 +5,7 @@ import { ChatInput } from "./ChatInput";
 import { SearchScopePicker } from "./SearchScopePicker";
 import { MemoryIndicator } from "./MemoryIndicator";
 import { FollowupSuggestionList } from "./FollowupSuggestionList";
+import { ConversationHeaderActions } from "./ConversationHeaderActions";
 import { EmptyState } from "../../../components/EmptyState";
 import { Loader } from "../../../components/Loader";
 import { MessageSquare } from "lucide-react";
@@ -171,12 +172,15 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
       {/* Conversation title header */}
       <div className="flex items-center gap-2 border-b px-4 py-3 min-h-[52px]">
         <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <h1 className="truncate text-sm font-semibold text-foreground">
+        <h1 className="truncate text-sm font-semibold text-foreground flex-1 min-w-0">
           {conversationId
             ? (conversations.find((c) => c.id === conversationId)?.title ??
               "Conversation")
             : "Conversation"}
         </h1>
+        {conversationId && (
+          <ConversationHeaderActions conversationId={conversationId} />
+        )}
       </div>
 
       {/* Error banner */}

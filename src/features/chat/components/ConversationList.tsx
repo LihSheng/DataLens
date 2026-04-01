@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Plus, MessageSquare, RefreshCw } from "lucide-react";
 import { ConversationItem } from "./ConversationItem";
+import { ConversationSearchInput } from "./ConversationSearchInput";
+import { ConversationSearchResults } from "./ConversationSearchResults";
 import { EmptyState } from "../../../components/EmptyState";
 import { Loader } from "../../../components/Loader";
 import { ConfirmDialog } from "../../../components/ui/ConfirmDialog";
 import { useConversations } from "../hooks/useConversations";
+import { useConversationSearch } from "../hooks/useConversationSearch";
 import { useChatStore } from "../store";
 import { useUIStore } from "../../../store/uiStore";
 import type { Conversation } from "../../../types";
@@ -51,6 +54,31 @@ export function ConversationList() {
     isOpen: false,
     conv: null,
   });
+
+  // Search state with debounce
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [searchQuery]);
+
+  const {
+    results: searchResults,
+    isLoading: isSearchLoading,
+    isError: isSearchError,
+  } = useConversationSearch(debouncedQuery);
+
+  const isSearching = debouncedQuery.trim().length > 0;
 
   const handleNewChat = () => {
     createConversation(undefined);
@@ -103,6 +131,25 @@ export function ConversationList() {
           )}
         </button>
       </div>
+
+      {/* Search input */}
+      <ConversationSearchInput
+        value={searchQuery}
+        onChange={setSearchQuery}
+        isLoading={isSearchLoading}
+      />
+
+      {/* Search results (shown when searching) */}
+      {isSearching && (
+        <div className="flex-1 overflow-y-auto border-b">
+          <ConversationSearchResults
+            results={searchResults}
+            isLoading={isSearchLoading}
+            isError={isSearchError}
+            query={debouncedQuery}
+          />
+        </div>
+      )}
 
       {/* List */}
       <div className="flex-1 overflow-y-auto">

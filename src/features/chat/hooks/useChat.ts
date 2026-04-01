@@ -90,6 +90,7 @@ export function useSendMessage() {
             routedToModel?: string;
             noAnswerReason?: string;
             citationValidity?: Message["citationValidity"];
+            tokenUsage?: Message["tokenUsage"];
           };
           try {
             data = JSON.parse(raw.trim());

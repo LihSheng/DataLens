@@ -231,6 +231,98 @@ export const chatHandlers = [
 
     return HttpResponse.json(feedback, { status: 201 });
   }),
+
+  // GET /api/conversations/search?q={query}
+  http.get("/api/conversations/search", ({ request }) => {
+    const url = new URL(request.url);
+    const q = url.searchParams.get("q")?.toLowerCase() ?? "";
+    if (!q) return HttpResponse.json([]);
+
+    const results = conversations
+      .filter((c) => c.title.toLowerCase().includes(q))
+      .map((c) => {
+        // Build a snippet from the first user message if available
+        const msgs = messages[c.id];
+        const firstUser = msgs?.find((m) => m.role === "user");
+        return {
+          ...c,
+          snippet: firstUser
+            ? firstUser.content.slice(0, 120) +
+              (firstUser.content.length > 120 ? "…" : "")
+            : undefined,
+        };
+      });
+
+    return HttpResponse.json(results);
+  }),
+
+  // GET /api/conversations/:id/export?format=md|pdf
+  http.get("/api/conversations/:id/export", ({ params, request }) => {
+    const { id } = params as { id: string };
+    const url = new URL(request.url);
+    const format = url.searchParams.get("format") ?? "md";
+
+    const conv = conversations.find((c) => c.id === id);
+    const convMessages = messages[id] ?? [];
+
+    const md = [
+      `# ${conv?.title ?? "Conversation"}`,
+      "",
+      ...convMessages.map((m) => {
+        const role = m.role === "user" ? "**You**" : "**Assistant**";
+        return `${role}:\n\n${m.content}`;
+      }),
+    ].join("\n\n");
+
+    if (format === "md") {
+      return new HttpResponse(md, {
+        headers: {
+          "Content-Type": "text/markdown;charset=utf-8",
+          "Content-Disposition": `attachment; filename="conversation.md"`,
+        },
+      });
+    }
+
+    // PDF falls back to markdown (no actual PDF generation in mock)
+    return new HttpResponse(md, {
+      headers: {
+        "Content-Type": "text/markdown;charset=utf-8",
+        "Content-Disposition": `attachment; filename="conversation.md"`,
+      },
+    });
+  }),
+
+  // POST /api/conversations/:id/share
+  http.post("/api/conversations/:id/share", ({ params }) => {
+    const { id } = params as { id: string };
+    const conv = conversations.find((c) => c.id === id);
+    if (!conv) {
+      return HttpResponse.json(
+        { message: "Conversation not found" },
+        { status: 404 },
+      );
+    }
+    return HttpResponse.json({
+      token: "mock_token_123",
+      url: `/share/mock_token_123`,
+    });
+  }),
+
+  // GET /api/share/:token
+  http.get("/api/share/:token", ({ params }) => {
+    const { token: _ } = params as { token: string };
+    void _; // token not used in mock — any token returns the same shared conversation
+    // Return the first conversation as the shared one for the mock token
+    const conv = conversations[0];
+    const convMessages = messages[conv.id] ?? [];
+    return HttpResponse.json({
+      id: conv.id,
+      title: conv.title,
+      messages: convMessages,
+      createdAt: conv.createdAt,
+      updatedAt: conv.updatedAt,
+    });
+  }),
 ];
 
 export { conversations, messages };

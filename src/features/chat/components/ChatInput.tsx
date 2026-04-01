@@ -150,3 +150,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
     );
   },
 );
+
+export interface ChatInputHandle {
+  focus: () => void;
+}

@@ -175,3 +175,26 @@ export interface ApiError {
   code?: string;
   status?: number;
 }
+
+// ─── Shared Conversation ─────────────────────────────────────────────────────
+
+export interface SharedConversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ConversationSearchResult {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  snippet?: string;
+}
+
+export interface ShareLinkResponse {
+  token: string;
+  url: string;
+}

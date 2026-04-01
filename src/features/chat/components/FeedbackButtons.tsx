@@ -26,12 +26,7 @@ export function FeedbackButtons({ message }: FeedbackButtonsProps) {
     return <FeedbackSubmittedState />;
   }
 
-  // If submitted locally (optimistic), show submitted state
-  if (localState === "positive" || localState === "negative") {
-    return <FeedbackSubmittedState />;
-  }
-
-  // Show negative feedback form inline
+  // Show negative feedback form while user is composing/updating feedback
   if (localState === "negative") {
     return (
       <NegativeFeedbackForm
@@ -41,13 +36,12 @@ export function FeedbackButtons({ message }: FeedbackButtonsProps) {
             {
               messageId: message.id,
               conversationId: message.conversationId,
-              traceId: message.id, // using message id as trace id for now
+              traceId: message.id,
               rating: "negative",
               comment,
             },
             {
               onSuccess: () => {
-                setLocalState("negative");
                 setFeedbackSubmitted(message.id, "negative");
               },
             },
@@ -57,6 +51,11 @@ export function FeedbackButtons({ message }: FeedbackButtonsProps) {
         isSubmitting={isPending}
       />
     );
+  }
+
+  // Optimistic submitted state (thumbs up just clicked, awaiting API)
+  if (localState === "positive") {
+    return <FeedbackSubmittedState />;
   }
 
   const handlePositive = () => {

@@ -33,6 +33,11 @@ const KnowledgeBasePage = lazy(() =>
 const SettingsPage = lazy(() =>
   import("./pages/SettingsPage").then((m) => ({ default: m.SettingsPage })),
 );
+const SharedConversationPage = lazy(() =>
+  import("./pages/SharedConversationPage").then((m) => ({
+    default: m.SharedConversationPage,
+  })),
+);
 
 // ─── Sentry ─────────────────────────────────────────────────────────────────
 
@@ -257,6 +262,15 @@ function RoutesComponent() {
             }
           />
         </Route>
+
+        <Route
+          path="/share/:token"
+          element={
+            <RouteErrorBoundary>
+              <SharedConversationPage />
+            </RouteErrorBoundary>
+          }
+        />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
