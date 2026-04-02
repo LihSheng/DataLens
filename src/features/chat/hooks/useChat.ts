@@ -4,7 +4,7 @@ import { chatApi } from "../../../services/api/chat";
 import { useChatStore } from "../store";
 import { useAuthStore } from "../../auth/store";
 import { useUIStore } from "../../../store/uiStore";
-import type { Message } from "../../../types";
+import type { Message, TraceMetadata } from "../../../types";
 
 const MESSAGES_KEY = (conversationId: string) =>
   ["conversations", conversationId, "messages"] as const;
@@ -69,6 +69,7 @@ export function useSendMessage() {
       let noAnswerReason: string | undefined;
       let citationValidity: Message["citationValidity"];
       let tokenUsage: Message["tokenUsage"];
+      let traceMetadata: TraceMetadata | undefined;
 
       const filters =
         activeFilters.document_ids && activeFilters.document_ids.length > 0
@@ -86,6 +87,7 @@ export function useSendMessage() {
           const raw = decoder.decode(value, { stream: true });
           // value is a JSON string of the SSE data
           let data: {
+            type?: string;
             content?: string;
             sources?: Message["sources"];
             suggestedFollowups?: string[];
@@ -97,6 +99,7 @@ export function useSendMessage() {
             noAnswerReason?: string;
             citationValidity?: Message["citationValidity"];
             tokenUsage?: Message["tokenUsage"];
+            metadata?: TraceMetadata;
           };
           try {
             data = JSON.parse(raw.trim());
@@ -126,6 +129,9 @@ export function useSendMessage() {
           if (data.noAnswerReason) noAnswerReason = data.noAnswerReason;
           if (data.citationValidity) citationValidity = data.citationValidity;
           if (data.tokenUsage) tokenUsage = data.tokenUsage;
+          if (data.type === "trace_metadata" && data.metadata) {
+            traceMetadata = data.metadata as TraceMetadata;
+          }
         }
       } finally {
         reader.releaseLock();
@@ -142,6 +148,7 @@ export function useSendMessage() {
         noAnswerReason,
         citationValidity,
         tokenUsage,
+        traceMetadata,
       });
 
       if (sources.length > 0) {

@@ -41,6 +41,7 @@ interface ChatState {
     noAnswerReason?: string;
     citationValidity?: Message["citationValidity"];
     tokenUsage?: Message["tokenUsage"];
+    traceMetadata?: Message["traceMetadata"];
   }) => void;
   failStream: (error: string) => void;
   clearMessages: (conversationId: string) => void;

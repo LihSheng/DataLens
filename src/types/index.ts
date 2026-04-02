@@ -29,6 +29,13 @@ export interface Source {
   rerankScore?: number;
 }
 
+export interface TraceMetadata {
+  traceId: string;
+  tokens: number;
+  retrievedChunks: number;
+  usedChunks: number;
+}
+
 export interface Message {
   id: string;
   conversationId: string;
@@ -47,6 +54,7 @@ export interface Message {
   citationValidity?: CitationValidity[];
   latencyMs?: number;
   tokenUsage?: TokenUsage;
+  traceMetadata?: TraceMetadata;
 }
 
 export interface Conversation {
