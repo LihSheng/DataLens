@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
-import { ChatInput } from "./ChatInput";
+import { ChatInput, ChatInputHandle } from "./ChatInput";
 import { SearchScopePicker } from "./SearchScopePicker";
 import { MemoryIndicator } from "./MemoryIndicator";
 import { FollowupSuggestionList } from "./FollowupSuggestionList";
@@ -46,6 +46,8 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const isUserScrolledRef = useRef(false);
+  const chatInputRef = useRef<ChatInputHandle | null>(null);
+  const prevConvIdRef = useRef<string | null>(null);
 
   const scrollThreadToBottom = (behavior: ScrollBehavior = "smooth") => {
     const container = scrollRef.current;
@@ -131,6 +133,16 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
     setVisibleFollowupMessageId(null);
     setDraftMessage("");
   }, [conversationId, setVisibleFollowupMessageId, setDraftMessage]);
+
+  // Auto-focus the chat input when the active conversation changes
+  useEffect(() => {
+    if (conversationId && conversationId !== prevConvIdRef.current) {
+      prevConvIdRef.current = conversationId;
+      // Small delay ensures the DOM has settled after conversation switch
+      const timer = setTimeout(() => chatInputRef.current?.focus(), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [conversationId]);
 
   const handleSend = (messageText: string) => {
     if (!messageText.trim()) return;
@@ -273,6 +285,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
           <MemoryIndicator messageCount={Math.max(0, messages.length - 1)} />
         </div>
         <ChatInput
+          ref={chatInputRef}
           onSend={handleSend}
           isStreaming={isStreaming}
           draft={draftMessage}

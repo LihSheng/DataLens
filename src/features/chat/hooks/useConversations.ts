@@ -33,6 +33,7 @@ export function useConversations() {
     mutationFn: (title?: string) => chatApi.createConversation(title),
     onSuccess: (newConversation: Conversation) => {
       addConversation(newConversation);
+      setActiveConversation(newConversation.id);
       queryClient.invalidateQueries({ queryKey: CONVERSATIONS_KEY });
     },
   });
