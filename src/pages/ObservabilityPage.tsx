@@ -9,6 +9,7 @@ import { RunEvaluationButton } from "../features/observability/components/RunEva
 import { FeedbackStatsCard } from "../features/observability/components/FeedbackStatsCard";
 import { CostSummaryCards } from "../features/observability/components/CostSummaryCards";
 import { AuditTable } from "../features/observability/components/AuditTable";
+import { TraceListTab } from "../features/observability/components/TraceListTab";
 import {
   useEvaluationRuns,
   useFeedbackStats,
@@ -142,6 +143,8 @@ export function ObservabilityPage() {
             />
           </div>
         )}
+
+        {activeTab === "traces" && <TraceListTab />}
       </div>
     </div>
   );

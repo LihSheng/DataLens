@@ -3,10 +3,16 @@ import {
   MessageSquare,
   DollarSign,
   ShieldAlert,
+  Activity,
 } from "lucide-react";
 import { cn } from "../../../lib/utils";
 
-export type ObservabilityTab = "evaluation" | "feedback" | "cost" | "audit";
+export type ObservabilityTab =
+  | "evaluation"
+  | "feedback"
+  | "cost"
+  | "audit"
+  | "traces";
 
 interface TabItem {
   id: ObservabilityTab;
@@ -19,6 +25,7 @@ const TABS: TabItem[] = [
   { id: "feedback", label: "Feedback", icon: MessageSquare },
   { id: "cost", label: "Cost", icon: DollarSign },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
+  { id: "traces", label: "Traces", icon: Activity },
 ];
 
 interface ObservabilityTabsProps {

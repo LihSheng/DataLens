@@ -79,3 +79,38 @@ export interface PaginatedAuditEvents {
   pageSize: number;
   totalPages: number;
 }
+
+// ─── Phoenix / Traces ──────────────────────────────────────────────────────────
+
+export interface TraceSummary {
+  traceId: string;
+  startTime: string;
+  endTime?: string;
+  latencyMs?: number;
+  numSpans: number;
+}
+
+export interface Trace {
+  traceId: string;
+  startTime: string;
+  endTime?: string;
+  latencyMs?: number;
+  attributes?: Record<string, unknown>;
+}
+
+export interface Span {
+  spanId: string;
+  parentSpanId?: string;
+  name: string;
+  startTime: string;
+  endTime?: string;
+  duration?: number;
+  attributes?: Record<string, unknown>;
+  status?: string;
+}
+
+export interface EvalScore {
+  name: string;
+  label: number | string;
+  score?: number;
+}

@@ -95,3 +95,34 @@ export function useExportAudit() {
     enabled: false,
   });
 }
+
+// ─── Phoenix / Traces ──────────────────────────────────────────────────────────
+
+import { phoenixService } from "../../../services/phoenixService";
+import type { TraceSummary } from "../../../types/observability";
+
+export function useTraces(limit = 50) {
+  return useQuery<TraceSummary[]>({
+    queryKey: ["phoenix", "traces"],
+    queryFn: async () => {
+      const res = await phoenixService.listTraces(limit);
+      return res.data;
+    },
+    refetchInterval: 30_000,
+  });
+}
+
+export function useTraceDetail(traceId: string | null) {
+  return useQuery({
+    queryKey: ["phoenix", "trace", traceId],
+    queryFn: async () => {
+      const [trace, spans, evals] = await Promise.all([
+        phoenixService.getTrace(traceId!),
+        phoenixService.getSpans(traceId!),
+        phoenixService.getEvaluations(traceId!),
+      ]);
+      return { trace: trace.data, spans: spans.data, evals: evals.data };
+    },
+    enabled: !!traceId,
+  });
+}
