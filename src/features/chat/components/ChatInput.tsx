@@ -21,6 +21,10 @@ interface ChatInputProps {
   onDraftChange?: (value: string) => void;
 }
 
+export interface ChatInputHandle {
+  focus: () => void;
+}
+
 export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
   ({ onSend, disabled, isStreaming, draft, onDraftChange }, ref) => {
     const [internalValue, setInternalValue] = useState("");
@@ -150,7 +154,3 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
     );
   },
 );
-
-export interface ChatInputHandle {
-  focus: () => void;
-}

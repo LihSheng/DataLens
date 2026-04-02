@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
-import { ChatInput, ChatInputHandle } from "./ChatInput";
+import { ChatInput } from "./ChatInput";
 import { SearchScopePicker } from "./SearchScopePicker";
 import { MemoryIndicator } from "./MemoryIndicator";
 import { FollowupSuggestionList } from "./FollowupSuggestionList";
 import { ConversationHeaderActions } from "./ConversationHeaderActions";
 import { EmptyState } from "../../../components/EmptyState";
-import { Loader } from "../../../components/Loader";
 import { MessageSquare } from "lucide-react";
 import { useChatStore } from "../store";
 import { useMessages, useSendMessage } from "../hooks/useChat";
@@ -46,7 +45,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const isUserScrolledRef = useRef(false);
-  const chatInputRef = useRef<ChatInputHandle | null>(null);
+  const chatInputRef = useRef<{ focus: () => void } | null>(null);
   const prevConvIdRef = useRef<string | null>(null);
 
   const scrollThreadToBottom = (behavior: ScrollBehavior = "smooth") => {
@@ -226,8 +225,36 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
         className="flex-1 overflow-y-auto px-4 py-6"
       >
         {isLoading && (
-          <div className="flex justify-center py-12">
-            <Loader variant="spinner" className="h-6 w-6" />
+          <div className="space-y-5">
+            {/* Skeleton: assistant message */}
+            <div className="flex gap-2.5 animate-pulse">
+              <div className="h-7 w-7 rounded-full bg-muted shrink-0 mt-0.5" />
+              <div className="space-y-2 flex-1 max-w-xl">
+                <div className="h-3 bg-muted rounded-full w-12" />
+                <div className="space-y-1.5">
+                  <div className="h-3 bg-muted rounded-full w-full" />
+                  <div className="h-3 bg-muted rounded-full w-4/5" />
+                </div>
+              </div>
+            </div>
+            {/* Skeleton: user message */}
+            <div className="flex gap-2.5 justify-end animate-pulse">
+              <div className="space-y-1.5 flex-1 max-w-xl">
+                <div className="h-3 bg-muted rounded-full w-4/5 ml-auto" />
+                <div className="h-3 bg-muted rounded-full w-2/5 ml-auto" />
+              </div>
+            </div>
+            {/* Skeleton: assistant message */}
+            <div className="flex gap-2.5 animate-pulse">
+              <div className="h-7 w-7 rounded-full bg-muted shrink-0 mt-0.5" />
+              <div className="space-y-2 flex-1 max-w-xl">
+                <div className="h-3 bg-muted rounded-full w-12" />
+                <div className="space-y-1.5">
+                  <div className="h-3 bg-muted rounded-full w-full" />
+                  <div className="h-3 bg-muted rounded-full w-3/5" />
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
