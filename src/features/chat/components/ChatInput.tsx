@@ -100,7 +100,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
     const canSend = value.trim().length > 0 && !disabled && !isStreaming;
 
     return (
-      <div className="relative">
+      <div className="flex flex-col gap-2">
         <div className="flex items-start gap-2 rounded-xl border bg-card p-3 shadow-sm">
           <textarea
             ref={textareaRef}
@@ -126,9 +126,9 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
           </button>
         </div>
 
-        {/* Keyboard shortcuts tooltip */}
+        {/* Keyboard shortcuts hint */}
         <div
-          className="absolute right-0 top-full mt-1.5 z-10 flex items-center gap-3 rounded-md border bg-popover px-3 py-1.5 text-xs text-muted-foreground shadow-sm pointer-events-none"
+          className="flex items-center gap-3 text-xs text-muted-foreground self-end"
           aria-hidden="true"
         >
           <span>

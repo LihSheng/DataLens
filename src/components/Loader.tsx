@@ -16,7 +16,7 @@ export function Loader({ variant = "spinner", className = "" }: LoaderProps) {
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-primary/20 border-t-primary" />
     </div>
   );
 }
