@@ -218,3 +218,194 @@ export function getAuditEvents(filters: {
 
   return { events, total, page, pageSize, totalPages };
 }
+
+// ─── Phoenix / Traces Mock Data ────────────────────────────────────────────
+
+/** Mock trace list in Phoenix v4 format (snake_case fields) */
+export const MOCK_TRACES: Record<string, object>[] = [
+  {
+    trace_id: "trace_001abc1def",
+    start_time: "2026-04-02T08:30:00.000Z",
+    end_time: "2026-04-02T08:30:00.850Z",
+    latency_ms: 850,
+    num_spans: 5,
+  },
+  {
+    trace_id: "trace_002abc2def",
+    start_time: "2026-04-02T08:31:00.000Z",
+    end_time: "2026-04-02T08:31:01.200Z",
+    latency_ms: 1200,
+    num_spans: 6,
+  },
+  {
+    trace_id: "trace_003abc3def",
+    start_time: "2026-04-02T08:32:00.000Z",
+    end_time: "2026-04-02T08:32:00.520Z",
+    latency_ms: 520,
+    num_spans: 4,
+  },
+  {
+    trace_id: "trace_004abc4def",
+    start_time: "2026-04-02T08:35:00.000Z",
+    end_time: "2026-04-02T08:35:02.100Z",
+    latency_ms: 2100,
+    num_spans: 7,
+  },
+  {
+    trace_id: "trace_005abc5def",
+    start_time: "2026-04-02T08:40:00.000Z",
+    end_time: "2026-04-02T08:40:00.730Z",
+    latency_ms: 730,
+    num_spans: 5,
+  },
+];
+
+/** Mock spans for trace_001abc1def — Phoenix v4 format */
+export const MOCK_SPANS_TRACE_001: Record<string, unknown>[] = [
+  {
+    span_id: "span_root_001",
+    parent_id: undefined,
+    display_name: "rag_request",
+    start_time: "2026-04-02T08:30:00.000Z",
+    end_time: "2026-04-02T08:30:00.850Z",
+    duration: 850_000_000, // nanoseconds
+    status_code: 0, // ok
+    attributes: {
+      user_id: "usr_1",
+      conversation_id: "conv_sample",
+      query_length: 42,
+      retrieved_chunks: 8,
+      reranked_chunks: 4,
+      model: "gpt-4o-mini",
+    },
+  },
+  {
+    span_id: "span_hybrid_001",
+    parent_id: "span_root_001",
+    display_name: "hybrid_retrieval",
+    start_time: "2026-04-02T08:30:00.050Z",
+    end_time: "2026-04-02T08:30:00.200Z",
+    duration: 150_000_000,
+    status_code: 0,
+    attributes: {
+      chunks_returned: 8,
+      vector_weight: 0.7,
+      bm25_weight: 0.3,
+    },
+  },
+  {
+    span_id: "span_rerank_001",
+    parent_id: "span_root_001",
+    display_name: "cross_encoder_rerank",
+    start_time: "2026-04-02T08:30:00.210Z",
+    end_time: "2026-04-02T08:30:00.320Z",
+    duration: 110_000_000,
+    status_code: 0,
+    attributes: {
+      model: "BAAI/bge-reranker-base",
+      input_docs: 8,
+      output_docs: 4,
+      top_score: 0.94,
+    },
+  },
+  {
+    span_id: "span_context_001",
+    parent_id: "span_root_001",
+    display_name: "context_assembly",
+    start_time: "2026-04-02T08:30:00.330Z",
+    end_time: "2026-04-02T08:30:00.380Z",
+    duration: 50_000_000,
+    status_code: 0,
+    attributes: {
+      chunks_used: 4,
+      tokens_used: 1420,
+      token_budget: 1800,
+    },
+  },
+  {
+    span_id: "span_llm_001",
+    parent_id: "span_root_001",
+    display_name: "llm_generation",
+    start_time: "2026-04-02T08:30:00.390Z",
+    end_time: "2026-04-02T08:30:00.850Z",
+    duration: 460_000_000,
+    status_code: 0,
+    attributes: {
+      model: "gpt-4o-mini",
+      input_tokens: 1420,
+      output_tokens: 380,
+      cost_usd: 0.0023,
+    },
+  },
+];
+
+/** Mock spans for trace_004abc4def (slow/large trace) */
+export const MOCK_SPANS_TRACE_004: Record<string, unknown>[] = [
+  {
+    span_id: "span_root_004",
+    parent_id: undefined,
+    display_name: "rag_request",
+    start_time: "2026-04-02T08:35:00.000Z",
+    end_time: "2026-04-02T08:35:02.100Z",
+    duration: 2_100_000_000,
+    status_code: 2, // error
+    attributes: {
+      user_id: "usr_3",
+      conversation_id: "conv_slow",
+      query_length: 128,
+      error: "timeout",
+    },
+  },
+  {
+    span_id: "span_hybrid_004",
+    parent_id: "span_root_004",
+    display_name: "hybrid_retrieval",
+    start_time: "2026-04-02T08:35:00.010Z",
+    end_time: "2026-04-02T08:35:01.200Z",
+    duration: 1_190_000_000,
+    status_code: 0,
+    attributes: { chunks_returned: 12 },
+  },
+  {
+    span_id: "span_llm_004",
+    parent_id: "span_root_004",
+    display_name: "llm_generation",
+    start_time: "2026-04-02T08:35:01.300Z",
+    end_time: "2026-04-02T08:35:02.100Z",
+    duration: 800_000_000,
+    status_code: 2,
+    attributes: { error: "model_timeout" },
+  },
+];
+
+/** Mock eval scores for trace_001abc1def — Phoenix v4 format */
+export const MOCK_EVALS_TRACE_001: Record<string, unknown>[] = [
+  {
+    name: "Faithfulness",
+    label: 0.92,
+    score: 0.92,
+    metric_name: "faithfulness",
+  },
+  {
+    name: "Answer Relevance",
+    label: 0.88,
+    score: 0.88,
+    metric_name: "answer_relevance",
+  },
+  {
+    name: "Context Precision",
+    label: 0.95,
+    score: 0.95,
+    metric_name: "context_precision",
+  },
+  { name: "Human Feedback", label: "positive", metric_name: "human_feedback" },
+];
+
+/** Mock summary response */
+export const MOCK_PHOENIX_SUMMARY = {
+  total_traces: 127,
+  total_spans: 843,
+  avg_latency_ms: 780,
+  error_rate: 0.08,
+  traces_last_24h: 38,
+};
