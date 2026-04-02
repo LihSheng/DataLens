@@ -4,6 +4,9 @@ import { ConfidencePill } from "./ConfidencePill";
 import { GroundingIndicator } from "./GroundingIndicator";
 import { CachePill } from "./CachePill";
 import { ModelBadge } from "./ModelBadge";
+import { LatencyBadge } from "./LatencyBadge";
+import { TokenUsageBadge } from "./TokenUsageBadge";
+import { TraceLink } from "./TraceLink";
 import { NoAnswerState } from "./NoAnswerState";
 import { FeedbackButtons } from "./FeedbackButtons";
 import { useChatStore } from "../store";
@@ -142,12 +145,18 @@ export function ChatMessage({ message }: { message: Message }) {
             {message.routedToModel && (
               <ModelBadge model={message.routedToModel} />
             )}
-            {message.latencyMs && (
-              <span className="text-xs text-muted-foreground">
-                {message.latencyMs < 1000
-                  ? `${message.latencyMs}ms`
-                  : `${(message.latencyMs / 1000).toFixed(1)}s`}
-              </span>
+            {(message.traceMetadata?.latencyMs ?? message.latencyMs) && (
+              <LatencyBadge
+                latencyMs={
+                  message.traceMetadata?.latencyMs ?? message.latencyMs!
+                }
+              />
+            )}
+            {message.traceMetadata?.tokens != null && (
+              <TokenUsageBadge tokens={message.traceMetadata.tokens} />
+            )}
+            {message.traceMetadata?.traceId && (
+              <TraceLink traceId={message.traceMetadata.traceId} />
             )}
             <span className="text-xs text-muted-foreground ml-auto">
               {time}

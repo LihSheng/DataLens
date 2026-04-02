@@ -31,6 +31,7 @@ export interface Source {
 
 export interface TraceMetadata {
   traceId: string;
+  latencyMs: number;
   tokens: number;
   retrievedChunks: number;
   usedChunks: number;
