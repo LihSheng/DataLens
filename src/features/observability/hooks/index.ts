@@ -104,10 +104,7 @@ import type { TraceSummary } from "../../../types/observability";
 export function useTraces(limit = 50) {
   return useQuery<TraceSummary[]>({
     queryKey: ["phoenix", "traces"],
-    queryFn: async () => {
-      const res = await phoenixService.listTraces(limit);
-      return res.data;
-    },
+    queryFn: () => phoenixService.listTraces(limit),
     refetchInterval: 30_000,
   });
 }
@@ -121,7 +118,7 @@ export function useTraceDetail(traceId: string | null) {
         phoenixService.getSpans(traceId!),
         phoenixService.getEvaluations(traceId!),
       ]);
-      return { trace: trace.data, spans: spans.data, evals: evals.data };
+      return { trace, spans, evals };
     },
     enabled: !!traceId,
   });
