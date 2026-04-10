@@ -120,12 +120,16 @@ export function ChatMessage({ message }: { message: Message }) {
               message.citationValidity,
             )
           )}
-          {/* Blinking cursor during stream */}
+          {/* Running dot during stream */}
           {showCursor && (
             <span
-              className="inline-block h-4 w-0.5 bg-primary animate-pulse ml-1 mb-0.5"
+              className="flex h-2 items-center gap-0.5 ml-1 mb-0.5"
               aria-hidden="true"
-            />
+            >
+              <span className="h-1 w-1 animate-bounce rounded-full bg-primary [animation-delay:-0.2s]" />
+              <span className="h-1 w-1 animate-bounce rounded-full bg-primary [animation-delay:-0.1s]" />
+              <span className="h-1 w-1 animate-bounce rounded-full bg-primary" />
+            </span>
           )}
           {!isUser && !isStreaming && (
             <CopyButton text={message.content} className="shrink-0" />
