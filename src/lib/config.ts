@@ -4,6 +4,7 @@ export const config = {
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? "",
   sentryDsn: import.meta.env.VITE_SENTRY_DSN ?? "",
   appEnv: import.meta.env.VITE_APP_ENV ?? "development",
+  phoenixUrl: import.meta.env.VITE_PHOENIX_URL ?? "",
 } as const;
 
 export type AppEnv = "development" | "preview" | "production";

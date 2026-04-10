@@ -65,19 +65,44 @@ export function useCostSummary() {
 
 export function useAuditLog(filters: AuditFilters = {}) {
   const params = new URLSearchParams();
-  if (filters.userId) params.set("userId", filters.userId);
-  if (filters.eventType) params.set("eventType", filters.eventType);
-  if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
-  if (filters.dateTo) params.set("dateTo", filters.dateTo);
-  if (filters.page) params.set("page", String(filters.page));
-  if (filters.pageSize) params.set("pageSize", String(filters.pageSize));
+  if (filters.userId) params.set("user_id", filters.userId);
+  if (filters.eventType) params.set("action", filters.eventType);
+  if (filters.dateFrom) params.set("date_from", filters.dateFrom);
+  if (filters.dateTo) params.set("date_to", filters.dateTo);
+  if (filters.page)
+    params.set("offset", String((filters.page - 1) * (filters.pageSize ?? 50)));
+  if (filters.pageSize) params.set("limit", String(filters.pageSize));
 
   return useQuery<PaginatedAuditEvents>({
     queryKey: ["audit", filters],
     queryFn: async () => {
-      const res = await fetch(`/api/audit?${params.toString()}`);
+      const res = await fetch(`/api/admin/audit?${params.toString()}`, {
+        method: "POST",
+      });
       if (!res.ok) throw new Error("Failed to fetch audit log");
-      return res.json();
+      const data = await res.json();
+      // Map BE response (items/limit/offset) → FE type (events/page/totalPages)
+      const limit = data.limit ?? 50;
+      const offset = data.offset ?? 0;
+      const totalPages = Math.ceil((data.total ?? 0) / limit);
+      return {
+        events: (data.items ?? []).map((item: Record<string, unknown>) => ({
+          id: String(item.id ?? ""),
+          userId: String(item.user_id ?? ""),
+          userName: String(item.user_id ?? ""), // BE doesn't provide userName
+          eventType: String(item.action ?? ""),
+          description: item.details
+            ? JSON.stringify(item.details)
+            : String(item.resource ?? ""),
+          metadata: item.details as Record<string, unknown> | undefined,
+          ipAddress: String(item.ip_address ?? ""),
+          timestamp: String(item.created_at ?? ""),
+        })),
+        total: data.total ?? 0,
+        page: Math.floor(offset / limit) + 1,
+        pageSize: limit,
+        totalPages,
+      };
     },
   });
 }
@@ -88,7 +113,7 @@ export function useExportAudit() {
   return useQuery<string>({
     queryKey: ["audit", "export"],
     queryFn: async () => {
-      const res = await fetch("/api/audit/export?format=csv");
+      const res = await fetch("/api/admin/audit/export");
       if (!res.ok) throw new Error("Failed to export audit log");
       return res.text();
     },

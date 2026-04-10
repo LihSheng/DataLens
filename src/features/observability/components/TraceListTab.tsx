@@ -2,6 +2,7 @@ import { ExternalLink, Clock, GitBranch } from "lucide-react";
 import { useTraces } from "../hooks";
 import { Button } from "../../../components/ui/Button";
 import { TraceDetailDrawer } from "./TraceDetailDrawer";
+import { config } from "../../../lib/config";
 import { useState } from "react";
 
 function formatTime(iso: string): string {
@@ -50,7 +51,9 @@ export function TraceListTab() {
           variant="secondary"
           size="sm"
           leftIcon={<ExternalLink className="h-4 w-4" />}
-          onClick={() => window.open("/phoenix", "_blank")}
+          onClick={() =>
+            window.open(config.phoenixUrl || "http://localhost:6006", "_blank")
+          }
         >
           Open Phoenix
         </Button>
