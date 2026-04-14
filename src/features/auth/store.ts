@@ -52,6 +52,7 @@ interface AuthState {
   setToken: (token: string | null) => void;
   _setUser: (user: User | null) => void;
   clearError: () => void;
+  register: (name: string, email: string, password: string) => Promise<void>;
 }
 
 function toApiUrl(path: string): string {
@@ -133,6 +134,42 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           error: null,
         });
+      },
+
+      register: async (name: string, email: string, password: string) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const payload = { name, email, password };
+          console.debug("[auth/register] sending:", payload);
+          const res = await fetch(toApiUrl("/api/auth/register"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            const message = Array.isArray(data.detail)
+              ? data.detail.map((e: { msg?: string }) => e.msg).join(", ")
+              : (data.detail ?? data.message ?? "Registration failed");
+            throw new Error(message);
+          }
+
+          const data = await res.json();
+          set({
+            user: data.user,
+            accessToken: data.accessToken,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } catch (err) {
+          set({
+            error: err instanceof Error ? err.message : "Registration failed",
+            isLoading: false,
+          });
+          throw err;
+        }
       },
 
       setToken: (token) =>

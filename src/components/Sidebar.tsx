@@ -8,6 +8,7 @@ import {
   Bot,
   LogOut,
   BarChart2,
+  Users,
 } from "lucide-react";
 import { useUIStore } from "../store/uiStore";
 import { useAuthStore } from "../features/auth/store";
@@ -33,7 +34,10 @@ export function Sidebar() {
   const ALL_NAV_ITEMS = [
     ...NAV_ITEMS,
     ...(isAdmin
-      ? [{ to: "/observability", icon: BarChart2, label: "Observability" }]
+      ? [
+          { to: "/observability", icon: BarChart2, label: "Observability" },
+          { to: "/users", icon: Users, label: "Users" },
+        ]
       : []),
   ];
 

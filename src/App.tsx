@@ -23,6 +23,9 @@ import { httpClient } from "./services/httpClient";
 const LoginPage = lazy(() =>
   import("./pages/LoginPage").then((m) => ({ default: m.LoginPage })),
 );
+const RegisterPage = lazy(() =>
+  import("./pages/RegisterPage").then((m) => ({ default: m.RegisterPage })),
+);
 const ChatPage = lazy(() =>
   import("./pages/ChatPage").then((m) => ({ default: m.ChatPage })),
 );
@@ -42,6 +45,11 @@ const SharedConversationPage = lazy(() =>
 const ObservabilityPage = lazy(() =>
   import("./pages/ObservabilityPage").then((m) => ({
     default: m.ObservabilityPage,
+  })),
+);
+const UserManagementPage = lazy(() =>
+  import("./pages/UserManagementPage").then((m) => ({
+    default: m.UserManagementPage,
   })),
 );
 
@@ -208,6 +216,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/knowledge-base": "Knowledge Base",
   "/settings": "Settings",
   "/observability": "Observability",
+  "/users": "User Management",
 };
 
 function FocusManager() {
@@ -235,6 +244,7 @@ function RoutesComponent() {
       <Routes>
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Route>
 
         <Route
@@ -273,6 +283,14 @@ function RoutesComponent() {
             element={
               <RouteErrorBoundary>
                 <ObservabilityPage />
+              </RouteErrorBoundary>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <RouteErrorBoundary>
+                <UserManagementPage />
               </RouteErrorBoundary>
             }
           />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader } from "../components/Loader";
 import { useAuthStore } from "../features/auth/store";
 import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react";
@@ -183,6 +183,17 @@ export function LoginPage() {
           {isLoading && <Loader variant="spinner" className="h-4 w-4" />}
           {isLoading ? "Signing in…" : "Sign in"}
         </button>
+
+        {/* Register link */}
+        <p className="text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link
+            to="/register"
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
       </form>
     </div>
   );
