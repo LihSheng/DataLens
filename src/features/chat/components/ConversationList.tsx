@@ -9,7 +9,6 @@ import { ConfirmDialog } from "../../../components/ui/ConfirmDialog";
 import { useConversations } from "../hooks/useConversations";
 import { useConversationSearch } from "../hooks/useConversationSearch";
 import { useChatStore } from "../store";
-import { useUIStore } from "../../../store/uiStore";
 import type { Conversation } from "../../../types";
 
 function ConversationListSkeleton() {
@@ -45,7 +44,6 @@ export function ConversationList() {
     isDeleting,
   } = useConversations();
   const { activeConversationId, setActiveConversation } = useChatStore();
-  const pushToast = useUIStore((s) => s.pushToast);
 
   const [confirmDelete, setConfirmDelete] = useState<{
     isOpen: boolean;
@@ -100,11 +98,6 @@ export function ConversationList() {
   const handleConfirmDelete = () => {
     if (confirmDelete.conv) {
       deleteConversation(confirmDelete.conv.id);
-      pushToast({
-        message: `Conversation "${confirmDelete.conv.title}" deleted.`,
-        type: "success",
-        durationMs: 4000,
-      });
     }
     setConfirmDelete({ isOpen: false, conv: null });
   };

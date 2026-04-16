@@ -28,6 +28,19 @@ export function ChatPage() {
     }
   }, [activeConversationId, conversations]);
 
+  // If active conversation was deleted, move to a valid remaining conversation.
+  useEffect(() => {
+    if (!conversations || conversations.length === 0) {
+      return;
+    }
+    if (
+      activeConversationId &&
+      !conversations.some((c) => c.id === activeConversationId)
+    ) {
+      useChatStore.getState().setActiveConversation(conversations[0].id);
+    }
+  }, [activeConversationId, conversations]);
+
   return (
     <div className="flex h-[calc(100vh-7rem)] gap-0 rounded-xl border bg-card overflow-hidden">
       {/* Mobile: conversation list as slide-over drawer */}

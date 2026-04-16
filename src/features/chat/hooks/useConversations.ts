@@ -6,15 +6,13 @@ import { useUIStore } from "../../../store/uiStore";
 import type { Conversation } from "../../../types";
 
 export const CONVERSATIONS_KEY = ["conversations"] as const;
+const MESSAGES_KEY = (conversationId: string) =>
+  ["conversations", conversationId, "messages"] as const;
 
 export function useConversations() {
   const queryClient = useQueryClient();
-  const {
-    setConversations,
-    addConversation,
-    activeConversationId,
-    setActiveConversation,
-  } = useChatStore();
+  const { setConversations, addConversation, setActiveConversation } =
+    useChatStore();
   const pushToast = useUIStore((s) => s.pushToast);
 
   const query = useQuery({
@@ -69,28 +67,41 @@ export function useConversations() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => chatApi.deleteConversation(id),
-    onMutate: (id) => {
+    onMutate: async (id) => {
       // Cancel any outgoing refetches
-      queryClient.cancelQueries({ queryKey: CONVERSATIONS_KEY });
+      await queryClient.cancelQueries({ queryKey: CONVERSATIONS_KEY });
       // Snapshot previous value
       const previous =
         queryClient.getQueryData<Conversation[]>(CONVERSATIONS_KEY);
+      const previousActiveConversationId =
+        useChatStore.getState().activeConversationId;
+      const remainingConversations = previous
+        ? previous.filter((c) => c.id !== id)
+        : [];
       // Optimistically remove
       queryClient.setQueryData<Conversation[]>(CONVERSATIONS_KEY, (old) =>
         old ? old.filter((c) => c.id !== id) : [],
       );
-      // If deleting the active conversation, clear selection
-      if (activeConversationId === id) {
-        setActiveConversation(null);
+      // If deleting the active conversation, clear selection and messages
+      if (previousActiveConversationId === id) {
+        setActiveConversation(remainingConversations[0]?.id ?? null);
+        useChatStore.getState().clearMessages(id);
       }
-      return { previous };
+      return { previous, previousActiveConversationId };
     },
-    onError: (_err, _id, context) => {
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: MESSAGES_KEY(id) });
+      pushToast({ message: "Conversation deleted.", type: "success" });
+    },
+    onError: (_err, id, context) => {
       if (context?.previous !== undefined) {
         queryClient.setQueryData<Conversation[]>(
           CONVERSATIONS_KEY,
           context.previous,
         );
+      }
+      if (context?.previousActiveConversationId === id) {
+        setActiveConversation(id);
       }
       pushToast({ message: "Failed to delete conversation.", type: "error" });
     },
