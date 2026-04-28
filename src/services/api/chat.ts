@@ -36,6 +36,14 @@ export const chatApi = {
     await httpClient.delete(`/api/conversations/${id}`);
   },
 
+  /** Auto-generate a conversation title from its messages */
+  generateTitle: async (id: string): Promise<Conversation> => {
+    const res = await httpClient.post<Conversation>("/api/title", {
+      conversationId: id,
+    });
+    return res.data;
+  },
+
   /** Fetch messages for a conversation */
   getMessages: async (conversationId: string): Promise<Message[]> => {
     const res = await httpClient.get<Message[]>(
@@ -55,6 +63,7 @@ export const chatApi = {
       filters?: import("../../types").ChatFilters;
     },
     accessToken: string | null,
+    signal?: AbortSignal,
   ): ReadableStream => {
     const url = `${base}/api/chat`;
     const body = JSON.stringify(params);
@@ -71,6 +80,7 @@ export const chatApi = {
             ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
           },
           body,
+          signal,
         })
           .then((response) => {
             if (!response.body) {

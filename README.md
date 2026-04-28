@@ -75,9 +75,31 @@ The CI pipeline runs on every push to `main` and all pull requests. It executes:
 
 #### Environment Variables
 
-| Variable | Description | Default |
+| Variable | Required | Description |
 |---|---|---|
-| `VITE_API_BASE_URL` | Backend API URL | `/api` |
+| `VITE_API_BASE_URL` | Dev (MSW): No | Backend API origin (e.g., `http://127.0.0.1:6333`) |
+| `VITE_APP_ENV` | No | `development`, `preview`, or `production` |
+| `VITE_SENTRY_DSN` | No | Sentry error tracking |
+| `VITE_PHOENIX_URL` | No | Phoenix tracing endpoint |
+
+### Running Modes
+
+#### MSW Mode (default in dev)
+- `VITE_API_BASE_URL` is **not set** or empty
+- All `/api/*` requests are intercepted by MSW (Mock Service Worker)
+- No real backend required
+- Start: `npm run dev`
+
+#### Real Backend Mode (local development)
+- `VITE_API_BASE_URL=http://127.0.0.1:6333` (or your backend port)
+- All `/api/*` requests go to the real FastAPI backend
+- Backend must be running at the specified origin
+- Start: `VITE_API_BASE_URL=http://127.0.0.1:6333 npm run dev` (Windows: `set VITE_API_BASE_URL=http://127.0.0.1:6333 && npm run dev`)
+
+#### Production / Preview
+- `VITE_API_BASE_URL` must be set to the production backend origin
+- No MSW interception
+- Deploy to Vercel with the correct environment variable set
 
 > **Note:** MSW (Mock Service Worker) is automatically disabled in production builds. No extra configuration needed.
 

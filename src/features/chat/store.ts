@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { ChatFilters, Conversation, Message } from "../../types";
 
-type StreamStatus = "streaming" | "done" | "error";
+type StreamStatus = "connecting" | "streaming" | "done" | "error";
 
 interface StreamState {
   conversationId: string;
@@ -44,6 +44,7 @@ interface ChatState {
     traceMetadata?: Message["traceMetadata"];
   }) => void;
   failStream: (error: string) => void;
+  cancelStream: () => void;
   clearMessages: (conversationId: string) => void;
   setActiveFilters: (filters: ChatFilters) => void;
   clearActiveFilters: () => void;
@@ -53,6 +54,7 @@ interface ChatState {
     messageId: string,
     rating: "positive" | "negative",
   ) => void;
+  updateConversationTitle: (id: string, title: string) => void;
 }
 
 export const useChatStore = create<ChatState>()((set) => ({
@@ -191,6 +193,22 @@ export const useChatStore = create<ChatState>()((set) => ({
       };
     }),
 
+  cancelStream: () =>
+    set((s) => {
+      if (!s.streamState) return s;
+      const { conversationId, messageId } = s.streamState;
+      const messages = s.messagesByConversationId[conversationId] ?? [];
+      return {
+        messagesByConversationId: {
+          ...s.messagesByConversationId,
+          [conversationId]: messages.map((m) =>
+            m.id === messageId ? { ...m, status: "done" as const } : m,
+          ),
+        },
+        streamState: null,
+      };
+    }),
+
   clearMessages: (conversationId) =>
     set((s) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars -- omit key via destructuring
@@ -210,5 +228,12 @@ export const useChatStore = create<ChatState>()((set) => ({
   setFeedbackSubmitted: (messageId, rating) =>
     set((s) => ({
       submittedFeedback: { ...s.submittedFeedback, [messageId]: rating },
+    })),
+
+  updateConversationTitle: (id, title) =>
+    set((s) => ({
+      conversations: s.conversations.map((c) =>
+        c.id === id ? { ...c, title } : c,
+      ),
     })),
 }));

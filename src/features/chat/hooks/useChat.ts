@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { chatApi } from "../../../services/api/chat";
 import { useChatStore } from "../store";
@@ -26,13 +26,16 @@ export function useSendMessage() {
     appendStreamChunk,
     finaliseStream,
     failStream,
+    cancelStream,
     activeConversationId,
     activeFilters,
+    updateConversationTitle,
   } = useChatStore();
   const accessToken = useAuthStore((s) => s.accessToken);
   const pushToast = useUIStore((s) => s.pushToast);
   const openSourcePanel = useUIStore((s) => s.openSourcePanel);
   const highlightSource = useUIStore((s) => s.highlightSource);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const mutation = useMutation({
     mutationFn: async (params: {
@@ -75,7 +78,12 @@ export function useSendMessage() {
         activeFilters.document_ids && activeFilters.document_ids.length > 0
           ? activeFilters
           : undefined;
-      const stream = chatApi.sendMessage({ ...params, filters }, accessToken);
+      abortControllerRef.current = new AbortController();
+      const stream = chatApi.sendMessage(
+        { ...params, filters },
+        accessToken,
+        abortControllerRef.current.signal,
+      );
       const reader = stream.getReader();
       const decoder = new TextDecoder();
 
@@ -135,6 +143,7 @@ export function useSendMessage() {
         }
       } finally {
         reader.releaseLock();
+        abortControllerRef.current = null;
       }
 
       finaliseStream({
@@ -162,14 +171,36 @@ export function useSendMessage() {
       });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
 
+      // Fire-and-forget: auto-generate title for the conversation
+      generateTitleMutation.mutate(currentConversationId);
+
       return assistantContent;
     },
     onError: (error: Error) => {
-      failStream(error.message);
-      pushToast({
-        message: `Failed to send message: ${error.message}`,
-        type: "error",
-      });
+      if (error.name === "AbortError") {
+        cancelStream();
+      } else {
+        failStream(error.message);
+        pushToast({
+          message: `Failed to send message: ${error.message}`,
+          type: "error",
+        });
+      }
+    },
+  });
+
+  const generateTitleMutation = useMutation({
+    mutationFn: (conversationId: string) =>
+      chatApi.generateTitle(conversationId),
+    onSuccess: (updated: { id: string; title: string }) => {
+      updateConversationTitle(updated.id, updated.title);
+      queryClient.setQueryData(
+        ["conversations"],
+        (old: { id: string; title: string }[] | undefined) =>
+          old?.map((c) =>
+            c.id === updated.id ? { ...c, title: updated.title } : c,
+          ),
+      );
     },
   });
 
@@ -180,10 +211,15 @@ export function useSendMessage() {
     [mutation],
   );
 
+  const cancel = useCallback(() => {
+    abortControllerRef.current?.abort();
+  }, []);
+
   return {
     send,
     isStreaming: mutation.isPending,
     error: mutation.error,
     reset: mutation.reset,
+    cancel,
   };
 }

@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const devPort = Number.parseInt(process.env.VITE_DEV_PORT ?? '5333', 10)
+const defaultBaseUrl = `http://localhost:${Number.isFinite(devPort) ? devPort : 5333}`
+const baseURL = process.env.E2E_BASE_URL ?? defaultBaseUrl
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -8,7 +12,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL,
     trace: 'on-first-retry',
   },
   projects: [
@@ -18,8 +22,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
+    command: `npm run dev -- --host 0.0.0.0 --port ${Number.isFinite(devPort) ? devPort : 5333}`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
   },

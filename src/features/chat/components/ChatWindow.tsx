@@ -37,7 +37,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
     refetch,
   } = useMessages(conversationId);
 
-  const { send } = useSendMessage();
+  const { send, cancel } = useSendMessage();
   const [error, setError] = useState<string | null>(null);
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wasStreamingRef = useRef(false);
@@ -314,6 +314,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
         <ChatInput
           ref={chatInputRef}
           onSend={handleSend}
+          onStop={cancel}
           isStreaming={isStreaming}
           draft={draftMessage}
           onDraftChange={handleDraftChange}

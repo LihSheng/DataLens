@@ -16,6 +16,7 @@ import { AppLayout } from "./layouts/AppLayout";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { Loader } from "./components/Loader";
 import { Toast } from "./components/ui/Toast";
+import { ServiceStatusBanner } from "./components/ServiceStatusBanner";
 import { useAuthStore } from "./features/auth/store";
 import { config } from "./lib/config";
 import { httpClient } from "./services/httpClient";
@@ -322,6 +323,7 @@ function AppRoutes() {
   return (
     <>
       <FocusManager />
+      <ServiceStatusBanner />
       <SentryRoutes />
     </>
   );

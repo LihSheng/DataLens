@@ -18,6 +18,7 @@ import {
 } from "../features/observability/hooks";
 import type { AuditFilters } from "../types/observability";
 import { useAuthStore } from "../features/auth/store";
+import { observabilityApi } from "../services/api/observability";
 
 export function ObservabilityPage() {
   const [activeTab, setActiveTab] = useState<ObservabilityTab>("evaluation");
@@ -48,8 +49,7 @@ export function ObservabilityPage() {
   }
 
   async function handleExportAudit() {
-    const res = await fetch("/api/audit/export?format=csv");
-    const csv = await res.text();
+    const csv = await observabilityApi.exportAuditCsv();
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

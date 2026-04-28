@@ -6,10 +6,11 @@ import {
   forwardRef,
   useEffect,
 } from "react";
-import { Send } from "lucide-react";
+import { Send, Square } from "lucide-react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
+  onStop?: () => void;
   disabled?: boolean;
   isStreaming?: boolean;
   /**
@@ -26,7 +27,7 @@ export interface ChatInputHandle {
 }
 
 export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
-  ({ onSend, disabled, isStreaming, draft, onDraftChange }, ref) => {
+  ({ onSend, onStop, disabled, isStreaming, draft, onDraftChange }, ref) => {
     const [internalValue, setInternalValue] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -115,15 +116,26 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
             style={{ maxHeight: "160px" }}
             aria-label="Chat message input. Press Enter to send, Shift+Enter for new line, Cmd/Ctrl+K to focus."
           />
-          <button
-            onClick={handleSend}
-            disabled={!canSend}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label="Send message"
-            title="Send message"
-          >
-            <Send className="h-4 w-4" />
-          </button>
+          {isStreaming ? (
+            <button
+              onClick={onStop}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-destructive text-destructive-foreground transition-colors hover:bg-destructive/90"
+              aria-label="Stop generating"
+              title="Stop generating"
+            >
+              <Square className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleSend}
+              disabled={!canSend}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Send message"
+              title="Send message"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         {/* Keyboard shortcuts hint */}

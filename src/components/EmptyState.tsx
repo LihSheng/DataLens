@@ -5,6 +5,7 @@ interface EmptyStateProps {
   title: string;
   description?: string;
   action?: React.ReactNode;
+  secondaryAction?: React.ReactNode;
   className?: string;
 }
 
@@ -13,6 +14,7 @@ export function EmptyState({
   title,
   description,
   action,
+  secondaryAction,
   className = "",
 }: EmptyStateProps) {
   return (
@@ -28,7 +30,8 @@ export function EmptyState({
           {description}
         </p>
       )}
-      {action}
+      {action && <div className="flex items-center gap-2">{action}</div>}
+      {secondaryAction}
     </div>
   );
 }

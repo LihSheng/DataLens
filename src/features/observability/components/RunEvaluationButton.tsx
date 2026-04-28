@@ -1,16 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Play } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
+import { observabilityApi } from "../../../services/api/observability";
 
 export function RunEvaluationButton() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch("/api/evaluations/run", { method: "POST" });
-      if (!res.ok) throw new Error("Failed to run evaluation");
-      return res.json();
-    },
+    mutationFn: observabilityApi.runEvaluation,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["evaluations"] });
     },

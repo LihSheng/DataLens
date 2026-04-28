@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test'
 
+function appUrl(path: string): string {
+  const base = process.env.E2E_BASE_URL ?? `http://localhost:${process.env.VITE_DEV_PORT ?? '5333'}`
+  return new URL(path, base).toString()
+}
+
 test.beforeEach(async ({ page }) => {
   // Clear local storage and session to ensure clean auth state
   await page.goto('/')
@@ -21,7 +26,7 @@ test('login → send message → chat interface is functional', async ({ page })
   await page.getByRole('button', { name: /sign in/i }).click()
 
   // Should redirect to chat page
-  await expect(page).toHaveURL('http://localhost:5173/')
+  await expect(page).toHaveURL(appUrl('/'))
 
   // Chat page should show the conversation list (New Chat button)
   await expect(page.getByRole('button', { name: /new chat/i })).toBeVisible()
@@ -55,7 +60,7 @@ test('upload document → status shows Processing then Ready', async ({ page }) 
   await page.getByLabel(/email/i).fill('alice@example.com')
   await page.locator('#password').fill('password123')
   await page.getByRole('button', { name: /sign in/i }).click()
-  await expect(page).toHaveURL('http://localhost:5173/')
+  await expect(page).toHaveURL(appUrl('/'))
 
   // Navigate to Knowledge Base
   await page.getByRole('link', { name: /knowledge base/i }).click()
@@ -89,7 +94,7 @@ test('delete document → confirm dialog → row removed', async ({ page }) => {
   await page.getByLabel(/email/i).fill('alice@example.com')
   await page.locator('#password').fill('password123')
   await page.getByRole('button', { name: /sign in/i }).click()
-  await expect(page).toHaveURL('http://localhost:5173/')
+  await expect(page).toHaveURL(appUrl('/'))
 
   // Navigate to Knowledge Base
   await page.getByRole('link', { name: /knowledge base/i }).click()
@@ -124,7 +129,7 @@ test('logout → redirect to /login → protected route blocked', async ({ page 
   await page.getByLabel(/email/i).fill('alice@example.com')
   await page.locator('#password').fill('password123')
   await page.getByRole('button', { name: /sign in/i }).click()
-  await expect(page).toHaveURL('http://localhost:5173/')
+  await expect(page).toHaveURL(appUrl('/'))
 
   // Verify we're on the chat page
   await expect(page.getByRole('button', { name: /new chat/i })).toBeVisible()
@@ -157,7 +162,7 @@ test('admin retrieval settings → scoped chat → trust signals → feedback', 
   await page.getByLabel(/email/i).fill('alice@example.com')
   await page.locator('#password').fill('password123')
   await page.getByRole('button', { name: /sign in/i }).click()
-  await expect(page).toHaveURL('http://localhost:5173/')
+  await expect(page).toHaveURL(appUrl('/'))
 
   // 2. Go to Settings, change TopK to 3, save
   await page.getByRole('link', { name: /settings/i }).click()
@@ -202,7 +207,7 @@ test('admin retrieval settings → scoped chat → trust signals → feedback', 
 
   // 4. Go to Chat, send a message
   await page.getByRole('link', { name: /chat/i }).click()
-  await expect(page).toHaveURL('http://localhost:5173/')
+  await expect(page).toHaveURL(appUrl('/'))
 
   // Send a message
   const chatInput = page.locator('textarea[aria-label*="chat" i], textarea[placeholder*="message" i]').first()

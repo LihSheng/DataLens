@@ -80,7 +80,7 @@ export function SharedConversationPage() {
         ) : (
           data.messages.map((msg) => (
             <div key={msg.id} className="mb-4 last:mb-0">
-              <ChatMessage message={msg} isStreaming={false} />
+              <ChatMessage message={msg} />
             </div>
           ))
         )}
